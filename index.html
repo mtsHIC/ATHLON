@@ -35,6 +35,17 @@
       <section id="tab-today" class="tab-pane active">
         <!-- Estado: Treino NÃO iniciado -->
         <div id="today-pre-workout" class="view-section">
+          <!-- Card de Ofensiva Semanal (Streak) -->
+          <div class="streak-card" id="streak-card">
+            <div class="streak-header">
+              <div class="streak-badge"><span class="fire-icon">🔥</span> <strong id="streak-count">0 dias</strong> de ofensiva</div>
+              <span class="streak-week-label" id="streak-status-text">Consistência semanal</span>
+            </div>
+            <div class="streak-days-row" id="streak-days-row">
+              <!-- Dias Seg a Dom gerados via JS -->
+            </div>
+          </div>
+
           <div class="day-hero-card">
             <div class="day-tag" id="today-day-tag">SEGUNDA-FEIRA</div>
             <h2 id="today-workout-title">Treino de Hoje</h2>
@@ -47,6 +58,9 @@
             <div class="action-buttons">
               <button id="btn-start-workout" class="btn btn-primary btn-large">
                 <span class="btn-icon">🚀</span> Começar Treino de Hoje
+              </button>
+              <button id="btn-open-warmup" class="btn btn-warmup">
+                🔥 Guia de Aquecimento (3 min)
               </button>
               <button id="btn-switch-day" class="btn btn-secondary">
                 🔄 Fazer Treino de Outro Dia
@@ -99,6 +113,12 @@
                 <span class="badge-label">Neste exercício</span>
                 <span id="live-exercise-timer">00:00</span>
               </div>
+            </div>
+
+            <!-- Lembrete da Carga Anterior -->
+            <div class="last-weight-banner hidden" id="live-last-weight-banner">
+              <span class="last-weight-icon">⚡</span>
+              <span class="last-weight-text">Carga anterior: <strong id="live-last-weight-val">--</strong></span>
             </div>
 
             <!-- Tabela de Séries do Exercício Atual -->
@@ -405,6 +425,25 @@
         <div class="switch-day-list" id="switch-day-options">
           <!-- Opções dos treinos da semana para iniciar hoje -->
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Aquecimento Inteligente -->
+  <div id="modal-warmup" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-warmup-title">🔥 Aquecimento Inteligente (3-5 min)</h3>
+        <button class="modal-close" id="btn-close-modal-warmup">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="warmup-lead" id="warmup-lead-text">Prepare seus músculos e articulações para o treino de hoje.</p>
+        <div class="warmup-checklist" id="warmup-checklist-container">
+          <!-- Itens dinâmicos -->
+        </div>
+        <button id="btn-finish-warmup" class="btn btn-primary btn-block mt-4">
+          💪 Pronto para o Treino Principal!
+        </button>
       </div>
     </div>
   </div>

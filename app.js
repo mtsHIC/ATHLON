@@ -517,6 +517,158 @@ function setupNavigation() {
 // --- 5. ABA HOJE & EXECUÇÃO DO TREINO ---
 let currentSessionDayKey = null;
 
+// Lembrete da Carga Anterior
+function getLastPerformance(exerciseId, exerciseName) {
+  if (!state.history || state.history.length === 0) return null;
+
+  for (const session of state.history) {
+    if (!session.exercises) continue;
+    const found = session.exercises.find(e => 
+      (e.exerciseId && e.exerciseId === exerciseId) || 
+      (e.name && e.name.toLowerCase() === exerciseName.toLowerCase())
+    );
+    if (found && found.sets && found.sets.length > 0) {
+      const validSets = found.sets.filter(s => s.completed || s.weight > 0);
+      if (validSets.length > 0) {
+        const maxSet = validSets.reduce((prev, cur) => (prev.weight > cur.weight ? prev : cur));
+        return {
+          weight: maxSet.weight,
+          reps: maxSet.reps,
+          date: session.date
+        };
+      }
+    }
+  }
+  return null;
+}
+
+// Ofensiva Semanal (Streak Tracker)
+function updateStreakDisplay() {
+  const streakRow = document.getElementById('streak-days-row');
+  if (!streakRow) return;
+  streakRow.innerHTML = '';
+
+  const today = new Date();
+  const dayOfWeek = today.getDay(); // 0 = Dom, 1 = Seg ...
+  const diffToSeg = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  const monday = new Date(today);
+  monday.setDate(today.getDate() + diffToSeg);
+  monday.setHours(0, 0, 0, 0);
+
+  const daysShort = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+  let weekCompletedCount = 0;
+
+  for (let i = 0; i < 7; i++) {
+    const curDate = new Date(monday);
+    curDate.setDate(monday.getDate() + i);
+
+    const isToday = curDate.toDateString() === today.toDateString();
+    const dateStr = curDate.toISOString().slice(0, 10);
+    const hasWorkout = state.history.some(h => h.date && h.date.startsWith(dateStr));
+
+    if (hasWorkout) weekCompletedCount++;
+
+    const div = document.createElement('div');
+    div.className = `streak-day-item ${hasWorkout ? 'done' : ''} ${isToday ? 'today' : ''}`;
+    div.innerHTML = `
+      <span class="streak-day-name">${daysShort[i]}</span>
+      <span class="streak-day-status">${hasWorkout ? '✓' : ''}</span>
+    `;
+    streakRow.appendChild(div);
+  }
+
+  const streakCountEl = document.getElementById('streak-count');
+  const streakStatusEl = document.getElementById('streak-status-text');
+  if (streakCountEl) streakCountEl.textContent = `${weekCompletedCount} ${weekCompletedCount === 1 ? 'dia' : 'dias'}`;
+  if (streakStatusEl) {
+    streakStatusEl.textContent = weekCompletedCount > 0 
+      ? `${weekCompletedCount} de 5 treinos nesta semana` 
+      : 'Bora começar a semana!';
+  }
+}
+
+// Guia de Aquecimento Inteligente (Warmup)
+function openWarmupModal() {
+  const todayKey = currentSessionDayKey || getTodayKey();
+  const routine = state.routines[todayKey] || { name: '' };
+  const rName = (routine.name || '').toLowerCase();
+
+  let warmupItems = [];
+  let leadText = '';
+
+  if (rName.includes('push') || rName.includes('peito') || rName.includes('upper') || rName.includes('ombro')) {
+    leadText = 'Foco em aquecer peitoral, ombros e cotovelos com segurança antes das cargas.';
+    warmupItems = [
+      {
+        title: '1. Elevação de Temperatura (3 a 5 min)',
+        desc: 'Caminhada rápida na esteira ou polichinelos leves para aumentar a circulação sanguínea.'
+      },
+      {
+        title: '2. Mobilidade de Ombros e Manguito (2 min)',
+        desc: 'Faça 10 a 15 círculos com os braços para frente e para trás, e rotações com elástico ou halter leve de 1kg.'
+      },
+      {
+        title: '3. Série de Reconhecimento (1 série)',
+        desc: 'No primeiro exercício de hoje, faça 1 série de 12 repetições apenas com a barra vazia ou 30% da carga.'
+      }
+    ];
+  } else if (rName.includes('pull') || rName.includes('costas') || rName.includes('bíceps')) {
+    leadText = 'Foco em mobilidade de escápulas, dorsais e articulação do cotovelo.';
+    warmupItems = [
+      {
+        title: '1. Aquecimento Geral (3 a 5 min)',
+        desc: 'Esteira leve ou elíptico para acordar o corpo e preparar o sistema cardiovascular.'
+      },
+      {
+        title: '2. Ativação de Escápulas (2 min)',
+        desc: 'Sente na puxada alta com peso mínimo, focando apenas em subir e descer as escápulas sem dobrar os braços.'
+      },
+      {
+        title: '3. Série de Reconhecimento (1 série)',
+        desc: 'Faça a primeira série do exercício inicial com menos da metade da carga normal, sentindo o músculo dorsal.'
+      }
+    ];
+  } else {
+    leadText = 'Foco em aquecer quadril, joelhos e tornozelos para agachar com firmeza.';
+    warmupItems = [
+      {
+        title: '1. Bicicleta ou Esteira Inclinada (4 min)',
+        desc: 'Pedale em ritmo moderado para lubrificar as articulações dos joelhos e quadril.'
+      },
+      {
+        title: '2. Mobilidade de Quadril e Tornozelo (2 min)',
+        desc: '10 agachamentos profundos segurando em um suporte firme, alongando a virilha e calcanhares no chão.'
+      },
+      {
+        title: '3. Série de Reconhecimento (1 série)',
+        desc: '1 série de 10 agachamentos livres apenas com o peso do próprio corpo ou barra sem anilhas.'
+      }
+    ];
+  }
+
+  document.getElementById('warmup-lead-text').textContent = leadText;
+  const container = document.getElementById('warmup-checklist-container');
+  container.innerHTML = '';
+
+  warmupItems.forEach((item) => {
+    const div = document.createElement('div');
+    div.className = 'warmup-item';
+    div.innerHTML = `
+      <div class="warmup-checkbox">✓</div>
+      <div class="warmup-text-area">
+        <h4>${item.title}</h4>
+        <p>${item.desc}</p>
+      </div>
+    `;
+    div.addEventListener('click', () => {
+      div.classList.toggle('done');
+    });
+    container.appendChild(div);
+  });
+
+  document.getElementById('modal-warmup').classList.remove('hidden');
+}
+
 function setupTodayTab() {
   const todayKey = getTodayKey();
   currentSessionDayKey = todayKey;
@@ -530,10 +682,16 @@ function setupTodayTab() {
   document.getElementById('display-goal-time').textContent = `${state.settings.goalMinutes} minutos`;
 
   renderTodayPreview(todayKey);
+  updateStreakDisplay();
 
   // Botão Iniciar Treino
   document.getElementById('btn-start-workout').addEventListener('click', () => {
     startWorkoutSession(currentSessionDayKey);
+  });
+
+  // Botão Guia de Aquecimento
+  document.getElementById('btn-open-warmup').addEventListener('click', () => {
+    openWarmupModal();
   });
 
   // Botão Trocar Dia do Treino
@@ -722,6 +880,16 @@ function renderCurrentExerciseStep() {
   document.getElementById('live-exercise-name').textContent = exData.exerciseName;
   document.getElementById('live-equip-name').textContent = exData.equipment || 'Livre / Máquina';
 
+  // Lembrete da Carga Anterior
+  const banner = document.getElementById('live-last-weight-banner');
+  const lastPerf = getLastPerformance(exData.exerciseId, exData.exerciseName);
+  if (lastPerf && lastPerf.weight > 0) {
+    banner.classList.remove('hidden');
+    document.getElementById('live-last-weight-val').textContent = `${lastPerf.weight}kg (${lastPerf.reps} reps)`;
+  } else {
+    banner.classList.add('hidden');
+  }
+
   // Séries
   const setsList = document.getElementById('live-sets-list');
   setsList.innerHTML = '';
@@ -865,6 +1033,7 @@ function finishWorkoutSession() {
     totalSeconds: totalTimeSecs,
     totalSetsCompleted: totalSetsCompleted,
     exercises: workout.exercisesData.map(e => ({
+      exerciseId: e.exerciseId,
       name: e.exerciseName,
       muscle: e.muscle,
       elapsedSeconds: e.elapsedSeconds,
@@ -874,6 +1043,7 @@ function finishWorkoutSession() {
 
   state.history.unshift(historyEntry);
   saveHistory();
+  updateStreakDisplay();
 
   // Limpar sessão ativa
   state.activeWorkout = null;
@@ -1345,6 +1515,20 @@ function openGifModal(name, gifUrl, notes) {
 }
 
 function setupModals() {
+  // Modal de Aquecimento
+  const modalWarmup = document.getElementById('modal-warmup');
+  document.getElementById('btn-close-modal-warmup').addEventListener('click', () => {
+    modalWarmup.classList.add('hidden');
+  });
+  document.getElementById('btn-finish-warmup').addEventListener('click', () => {
+    modalWarmup.classList.add('hidden');
+  });
+  modalWarmup.addEventListener('click', (e) => {
+    if (e.target === modalWarmup) {
+      modalWarmup.classList.add('hidden');
+    }
+  });
+
   // Modal de GIF
   const modalGif = document.getElementById('modal-gif');
   document.getElementById('btn-close-modal-gif').addEventListener('click', () => {
