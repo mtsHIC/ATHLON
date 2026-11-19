@@ -488,11 +488,15 @@ function setupServiceWorker() {
   const statusBadge = document.getElementById('offline-status');
   function updateOnlineStatus() {
     if (navigator.onLine) {
-      statusBadge.textContent = 'App Pronto';
-      statusBadge.style.color = '#00e676';
+      statusBadge.innerHTML = '<span class="tech-arrow">»</span> App Pronto';
+      statusBadge.style.color = '#ffffff';
+      statusBadge.style.borderColor = 'rgba(252, 50, 88, 0.45)';
+      statusBadge.style.background = 'rgba(252, 50, 88, 0.15)';
     } else {
-      statusBadge.textContent = 'Offline (100%)';
-      statusBadge.style.color = '#ff9100';
+      statusBadge.innerHTML = '<span class="tech-arrow">»</span> 100% Offline';
+      statusBadge.style.color = '#d0d5ea';
+      statusBadge.style.borderColor = 'rgba(78, 130, 245, 0.4)';
+      statusBadge.style.background = 'rgba(78, 130, 245, 0.15)';
     }
   }
   window.addEventListener('online', updateOnlineStatus);
