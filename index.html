@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0e1117">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>ATHLON - Treino & Academia</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Container Principal -->
+  <div id="app">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="header-content">
+        <div class="logo-area">
+          <span class="logo-icon">⚡</span>
+          <div>
+            <h1 class="app-title">ATHLON</h1>
+            <p class="app-subtitle" id="current-date-display">Hoje</p>
+          </div>
+        </div>
+        <div class="header-badge" id="offline-status">Offline OK</div>
+      </div>
+    </header>
+
+    <!-- Main Content Area (Tabs) -->
+    <main class="main-content">
+      
+      <!-- ABA 1: HOJE / MODO DE TREINO -->
+      <section id="tab-today" class="tab-pane active">
+        <!-- Estado: Treino NÃO iniciado -->
+        <div id="today-pre-workout" class="view-section">
+          <div class="day-hero-card">
+            <div class="day-tag" id="today-day-tag">SEGUNDA-FEIRA</div>
+            <h2 id="today-workout-title">Treino de Hoje</h2>
+            <p id="today-workout-desc">Preparando sua rotina...</p>
+            
+            <div class="workout-summary-box" id="today-workout-preview">
+              <!-- Lista resumida de exercícios de hoje -->
+            </div>
+
+            <div class="action-buttons">
+              <button id="btn-start-workout" class="btn btn-primary btn-large">
+                <span class="btn-icon">🚀</span> Começar Treino de Hoje
+              </button>
+              <button id="btn-switch-day" class="btn btn-secondary">
+                🔄 Fazer Treino de Outro Dia
+              </button>
+            </div>
+          </div>
+
+          <!-- Dica motivacional / meta -->
+          <div class="meta-card">
+            <div class="meta-icon">🎯</div>
+            <div class="meta-info">
+              <span class="meta-label">Meta diária</span>
+              <strong id="display-goal-time">60 minutos</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado: Treino EM ANDAMENTO (Live Workout) -->
+        <div id="today-active-workout" class="view-section hidden">
+          <!-- Barra de Cronômetro Geral -->
+          <div class="live-status-bar">
+            <div class="timer-card total-time-card">
+              <span class="timer-label">TEMPO TOTAL</span>
+              <span class="timer-display" id="live-total-timer">00:00:00</span>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="goal-progress-bar"></div>
+              </div>
+              <span class="progress-label" id="goal-progress-text">0 de 60 min</span>
+            </div>
+
+            <div class="exercise-stepper" id="exercise-stepper-text">
+              Exercício 1 de 5
+            </div>
+          </div>
+
+          <!-- Card do Exercício Atual -->
+          <div class="exercise-active-card">
+            <div class="exercise-header">
+              <div>
+                <span class="exercise-muscle-tag" id="live-muscle-tag">Peito</span>
+                <h2 class="exercise-name" id="live-exercise-name">Supino Reto</h2>
+                <div class="exercise-equipment" id="live-exercise-equip">
+                  <span>Equipamento:</span> <strong id="live-equip-name">Barra / Banco</strong>
+                </div>
+              </div>
+              <div class="exercise-time-badge">
+                <span class="badge-label">Neste exercício</span>
+                <span id="live-exercise-timer">00:00</span>
+              </div>
+            </div>
+
+            <!-- Tabela de Séries do Exercício Atual -->
+            <div class="sets-checklist">
+              <div class="sets-header">
+                <span>SÉRIE</span>
+                <span>REPS</span>
+                <span>PESO (KG)</span>
+                <span>STATUS</span>
+              </div>
+              <div id="live-sets-list" class="sets-rows">
+                <!-- Linhas de séries injetadas via JS -->
+              </div>
+            </div>
+
+            <!-- Timer de Descanso Rápido entre séries -->
+            <div class="rest-timer-box">
+              <div class="rest-info">
+                <span>⏱️ Descanso:</span>
+                <span id="rest-timer-display" class="rest-timer-value">00:00</span>
+              </div>
+              <div class="rest-presets">
+                <button class="btn-rest" data-seconds="30">30s</button>
+                <button class="btn-rest" data-seconds="60">60s</button>
+                <button class="btn-rest" data-seconds="90">90s</button>
+                <button class="btn-rest" data-seconds="120">2m</button>
+                <button id="btn-stop-rest" class="btn-rest-stop">Parar</button>
+              </div>
+            </div>
+
+            <!-- Controles do Exercício -->
+            <div class="exercise-nav-actions">
+              <button id="btn-prev-exercise" class="btn btn-secondary">
+                ⬅️ Anterior
+              </button>
+              <button id="btn-next-exercise" class="btn btn-primary">
+                Concluir & Próximo ➡️
+              </button>
+            </div>
+            
+            <button id="btn-finish-workout-early" class="btn btn-outline-danger mt-3">
+              🏁 Finalizar Treino Agora
+            </button>
+          </div>
+        </div>
+
+        <!-- Estado: Treino FINALIZADO (Resumo) -->
+        <div id="today-finished-workout" class="view-section hidden">
+          <div class="congrats-card">
+            <div class="congrats-icon">🏆</div>
+            <h2>Treino Concluído!</h2>
+            <p>Excelente trabalho! Seu progresso foi registrado no histórico.</p>
+
+            <div class="stats-grid">
+              <div class="stat-box">
+                <span class="stat-number" id="finish-total-time">00:00</span>
+                <span class="stat-label">Tempo Total</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-number" id="finish-exercises-count">0</span>
+                <span class="stat-label">Exercícios</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-number" id="finish-sets-count">0</span>
+                <span class="stat-label">Séries Feitas</span>
+              </div>
+            </div>
+
+            <h3 class="breakdown-title">Tempo por Exercício</h3>
+            <div id="finish-breakdown-list" class="breakdown-list">
+              <!-- Detalhes do tempo por exercício -->
+            </div>
+
+            <button id="btn-back-to-home" class="btn btn-primary btn-large mt-4">
+              Voltar para o Início
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABA 2: ROTINAS / DIAS DA SEMANA -->
+      <section id="tab-routines" class="tab-pane">
+        <div class="section-header">
+          <h2>Rotina Semanal</h2>
+          <p>Organize seus treinos de Segunda a Domingo</p>
+        </div>
+
+        <div class="days-selector-pills" id="days-selector">
+          <button class="day-pill active" data-day="seg">Segunda</button>
+          <button class="day-pill" data-day="ter">Terça</button>
+          <button class="day-pill" data-day="qua">Quarta</button>
+          <button class="day-pill" data-day="qui">Quinta</button>
+          <button class="day-pill" data-day="sex">Sexta</button>
+          <button class="day-pill" data-day="sab">Sábado</button>
+          <button class="day-pill" data-day="dom">Domingo</button>
+        </div>
+
+        <div class="routine-editor-card">
+          <div class="routine-meta-inputs">
+            <div class="form-group">
+              <label for="routine-name-input">Nome do Treino (ex: Peito e Tríceps)</label>
+              <input type="text" id="routine-name-input" class="form-input" placeholder="Ex: Peitoral e Tríceps">
+            </div>
+            <div class="form-group">
+              <label for="routine-focus-input">Foco / Observações</label>
+              <input type="text" id="routine-focus-input" class="form-input" placeholder="Ex: ênfase em carga e execução">
+            </div>
+          </div>
+
+          <div class="routine-exercises-list-header">
+            <h3>Exercícios do Dia (<span id="routine-count">0</span>)</h3>
+            <button id="btn-add-exercise-to-routine" class="btn btn-small btn-primary">
+              + Adicionar Exercício
+            </button>
+          </div>
+
+          <div id="routine-items-container" class="routine-items">
+            <!-- Itens de exercícios da rotina com séries, reps e peso -->
+          </div>
+
+          <button id="btn-save-routine" class="btn btn-success btn-block mt-3">
+            💾 Salvar Rotina deste Dia
+          </button>
+        </div>
+      </section>
+
+      <!-- ABA 3: BANCO DE EXERCÍCIOS -->
+      <section id="tab-exercises" class="tab-pane">
+        <div class="section-header-row">
+          <div>
+            <h2>Exercícios</h2>
+            <p>Catálogo de exercícios e equipamentos</p>
+          </div>
+          <button id="btn-open-modal-exercise" class="btn btn-primary btn-small">
+            + Novo Exercício
+          </button>
+        </div>
+
+        <!-- Filtro por Músculo -->
+        <div class="category-filter-chips" id="muscle-filter-chips">
+          <button class="chip active" data-muscle="all">Todos</button>
+          <button class="chip" data-muscle="Peito">Peito</button>
+          <button class="chip" data-muscle="Costas">Costas</button>
+          <button class="chip" data-muscle="Pernas">Pernas</button>
+          <button class="chip" data-muscle="Ombros">Ombros</button>
+          <button class="chip" data-muscle="Bíceps">Bíceps</button>
+          <button class="chip" data-muscle="Tríceps">Tríceps</button>
+          <button class="chip" data-muscle="Abdômen">Abdômen</button>
+        </div>
+
+        <div id="exercises-catalog-list" class="catalog-list">
+          <!-- Lista de exercícios -->
+        </div>
+      </section>
+
+      <!-- ABA 4: HISTÓRICO -->
+      <section id="tab-history" class="tab-pane">
+        <div class="section-header">
+          <h2>Histórico de Treinos</h2>
+          <p>Acompanhe sua frequência e tempos ao longo do tempo</p>
+        </div>
+
+        <div id="history-list" class="history-cards-container">
+          <!-- Registros de treinos passados -->
+        </div>
+      </section>
+
+      <!-- ABA 5: AJUSTES / DADOS -->
+      <section id="tab-settings" class="tab-pane">
+        <div class="section-header">
+          <h2>Configurações</h2>
+          <p>Metas, armazenamento local e backup</p>
+        </div>
+
+        <div class="settings-card">
+          <h3>🎯 Meta de Treino Diário</h3>
+          <p class="settings-desc">Defina quanto tempo você planeja passar treinando por dia (Segunda a Sexta).</p>
+          <div class="inline-input-row">
+            <input type="number" id="setting-goal-minutes" class="form-input" min="15" max="180" value="60">
+            <span>minutos</span>
+            <button id="btn-save-goal" class="btn btn-primary btn-small">Salvar</button>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h3>💾 Backup dos Dados (Offline)</h3>
+          <p class="settings-desc">Seus dados ficam 100% seguros no seu celular. Você pode exportar ou restaurar quando quiser.</p>
+          <div class="settings-actions">
+            <button id="btn-export-backup" class="btn btn-secondary">
+              📥 Exportar Backup (.json)
+            </button>
+            <label class="btn btn-secondary file-upload-btn">
+              📤 Importar Backup
+              <input type="file" id="input-import-backup" accept=".json" style="display:none;">
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-card danger-zone">
+          <h3>⚠️ Restaurar Exercícios Padrão</h3>
+          <p class="settings-desc">Restaura a lista completa de exercícios e rotinas de exemplo.</p>
+          <button id="btn-reset-defaults" class="btn btn-outline-danger btn-small">
+            Restaurar Dados Padrão
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Barra de Navegação Inferior (Mobile Tabs) -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-tab="tab-today">
+        <span class="nav-icon">🏋️</span>
+        <span class="nav-label">Hoje</span>
+      </button>
+      <button class="nav-item" data-tab="tab-routines">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">Rotinas</span>
+      </button>
+      <button class="nav-item" data-tab="tab-exercises">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Exercícios</span>
+      </button>
+      <button class="nav-item" data-tab="tab-history">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Histórico</span>
+      </button>
+      <button class="nav-item" data-tab="tab-settings">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">Ajustes</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- MODAL: Cadastrar/Editar Exercício no Catálogo -->
+  <div id="modal-exercise" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-exercise-title">Novo Exercício</h3>
+        <button class="modal-close" id="btn-close-modal-exercise">&times;</button>
+      </div>
+      <form id="form-exercise" class="modal-body">
+        <input type="hidden" id="exercise-edit-id">
+        <div class="form-group">
+          <label for="ex-name">Nome do Exercício *</label>
+          <input type="text" id="ex-name" class="form-input" required placeholder="Ex: Supino Inclinado">
+        </div>
+        <div class="form-group">
+          <label for="ex-muscle">Parte do Corpo / Músculo *</label>
+          <select id="ex-muscle" class="form-input" required>
+            <option value="Peito">Peito</option>
+            <option value="Costas">Costas</option>
+            <option value="Pernas">Pernas</option>
+            <option value="Ombros">Ombros</option>
+            <option value="Bíceps">Bíceps</option>
+            <option value="Tríceps">Tríceps</option>
+            <option value="Abdômen">Abdômen</option>
+            <option value="Cardio">Cardio / Aquecimento</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="ex-equipment">Equipamento *</label>
+          <input type="text" id="ex-equipment" class="form-input" required placeholder="Ex: Halteres, Barra, Máquina, Polia, Peso do corpo">
+        </div>
+        <div class="form-group">
+          <label for="ex-notes">Observações / Dicas de postura</label>
+          <textarea id="ex-notes" class="form-input" rows="2" placeholder="Ex: manter escápulas travadas"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-modal-exercise">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar no Catálogo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Escolher Exercício para Adicionar à Rotina -->
+  <div id="modal-select-exercise" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Adicionar ao Treino</h3>
+        <button class="modal-close" id="btn-close-modal-select">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Buscar Exercício:</label>
+          <input type="text" id="search-exercise-picker" class="form-input" placeholder="Digite para filtrar...">
+        </div>
+        <div class="exercise-picker-list" id="picker-exercises-list">
+          <!-- Lista clicável de exercícios do catálogo -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Trocar Treino de Hoje (Escolher outro dia) -->
+  <div id="modal-switch-day" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Escolha o Treino para Realizar</h3>
+        <button class="modal-close" id="btn-close-switch-day">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="switch-day-list" id="switch-day-options">
+          <!-- Opções dos treinos da semana para iniciar hoje -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
