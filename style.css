@@ -37,8 +37,11 @@ body {
   user-select: none;
   -webkit-user-select: none;
   background-image: 
-    radial-gradient(circle at 10% 20%, rgba(252, 50, 88, 0.04) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(78, 130, 245, 0.05) 0%, transparent 40%);
+    linear-gradient(rgba(38, 50, 110, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(38, 50, 110, 0.15) 1px, transparent 1px),
+    radial-gradient(circle at 10% 20%, rgba(252, 50, 88, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(78, 130, 245, 0.09) 0%, transparent 40%);
+  background-size: 28px 28px, 28px 28px, 100% 100%, 100% 100%;
   background-attachment: fixed;
 }
 
@@ -50,12 +53,12 @@ input, textarea, select {
 /* Header */
 .app-header {
   background: linear-gradient(180deg, #182150 0%, #111638 100%);
-  padding: 16px 20px 12px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 14px 20px 12px;
+  border-bottom: 2px solid var(--border-color);
   position: sticky;
   top: 0;
   z-index: 50;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
 }
 
 .header-content {
@@ -72,40 +75,260 @@ input, textarea, select {
   gap: 12px;
 }
 
+.logo-frame {
+  position: relative;
+  display: inline-flex;
+  padding: 2px;
+}
+
+.corner-bracket {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-color: var(--primary);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.corner-bracket.top-left {
+  top: -2px;
+  left: -2px;
+  border-width: 2px 0 0 2px;
+}
+
+.corner-bracket.bottom-right {
+  bottom: -2px;
+  right: -2px;
+  border-width: 0 2px 2px 0;
+}
+
 .logo-img {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-md);
-  border: 2px solid var(--primary);
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--primary);
   box-shadow: 0 4px 16px var(--primary-glow);
   object-fit: cover;
 }
 
+.brand-titles {
+  display: flex;
+  flex-direction: column;
+}
+
 .app-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 900;
-  letter-spacing: 0.8px;
-  color: var(--text-main);
+  letter-spacing: 1.2px;
+  line-height: 1.1;
   text-transform: uppercase;
+  display: flex;
+  align-items: baseline;
+}
+
+.title-hollow {
+  -webkit-text-stroke: 1.5px #ffffff;
+  color: transparent;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+}
+
+.title-solid {
+  color: var(--primary);
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  text-shadow: 0 0 16px var(--primary-glow);
+}
+
+.app-sub-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
 }
 
 .app-subtitle {
-  font-size: 13px;
-  color: var(--primary);
+  font-size: 12px;
+  color: var(--text-muted);
   font-weight: 700;
   text-transform: capitalize;
+  letter-spacing: 0.3px;
+}
+
+/* O bloco vermelho do topo direito do pôster com cortes verticais */
+.tech-slit-badge {
+  display: inline-block;
+  width: 28px;
+  height: 7px;
+  background: var(--primary);
+  position: relative;
+  border-radius: 1px;
+}
+
+.tech-slit-badge::after {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--bg-color);
+  box-shadow: 4px 0 0 var(--bg-color);
 }
 
 .header-badge {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 900;
   background: rgba(252, 50, 88, 0.15);
   color: var(--primary);
-  padding: 4px 10px;
-  border-radius: 20px;
-  border: 1px solid rgba(252, 50, 88, 0.35);
-  letter-spacing: 0.5px;
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(252, 50, 88, 0.4);
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  letter-spacing: 0.8px;
   text-transform: uppercase;
+}
+
+.tech-arrow {
+  display: inline-block;
+  color: var(--primary);
+  font-weight: 900;
+  margin-right: 2px;
+}
+
+/* ========================================================
+   FORMAS GEOMÉTRICAS AGRESSIVAS DO PÔSTER
+   (Círculos, matrizes de pontos, quadrados vazados, rasgos, miras)
+   ======================================================== */
+
+/* Matriz de Círculos / Dot Grid do Pôster */
+.card-tech-dots {
+  position: absolute;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #5b7be0 1.5px, transparent 1.5px);
+  background-size: 9px 9px;
+  opacity: 0.45;
+  z-index: 1;
+}
+
+.card-tech-dots.dots-3x2 {
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 24px;
+}
+
+.card-tech-dots.dots-4x3 {
+  top: 16px;
+  right: 20px;
+  width: 48px;
+  height: 34px;
+}
+
+/* Quadrado vazado fino rosa/coral do canto inferior do pôster */
+.hero-wire-square {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid rgba(252, 50, 88, 0.4);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-wire-square.wire-coral {
+  border-color: rgba(252, 50, 88, 0.55);
+}
+
+.card-wire-box {
+  position: absolute;
+  bottom: 8px;
+  right: 20px;
+  width: 40px;
+  height: 16px;
+  border: 1px solid rgba(208, 213, 234, 0.25);
+  pointer-events: none;
+}
+
+/* Cruzetas de mira técnica (+) */
+.hero-crosshair {
+  position: absolute;
+  font-family: monospace;
+  font-size: 14px;
+  font-weight: 800;
+  color: rgba(208, 213, 234, 0.35);
+  pointer-events: none;
+  line-height: 1;
+  z-index: 1;
+}
+
+.cross-top-left { top: 10px; left: 12px; }
+.cross-top-right { top: 10px; right: 12px; }
+.cross-bottom-left { bottom: 10px; left: 12px; }
+.cross-bottom-right { bottom: 10px; right: 12px; }
+
+/* Rasgos dinâmicos / Speed slashes do pôster */
+.hero-slashes {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 180px;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.slash-streak {
+  position: absolute;
+  border-radius: 2px;
+}
+
+.slash-streak.streak-1 {
+  top: 15px;
+  right: -30px;
+  width: 150px;
+  height: 22px;
+  background: linear-gradient(90deg, rgba(252, 50, 88, 0.35) 0%, rgba(252, 50, 88, 0) 100%);
+  transform: rotate(-32deg) skewX(-25deg);
+}
+
+.slash-streak.streak-2 {
+  top: 55px;
+  right: -15px;
+  width: 120px;
+  height: 10px;
+  background: linear-gradient(90deg, rgba(252, 50, 88, 0.45) 0%, rgba(252, 50, 88, 0) 100%);
+  transform: rotate(-32deg) skewX(-25deg);
+}
+
+.slash-streak.streak-3 {
+  top: 85px;
+  right: -40px;
+  width: 170px;
+  height: 16px;
+  background: linear-gradient(90deg, rgba(78, 130, 245, 0.3) 0%, rgba(78, 130, 245, 0) 100%);
+  transform: rotate(-32deg) skewX(-25deg);
+}
+
+.weight-slashes .streak-1 {
+  background: linear-gradient(90deg, rgba(252, 50, 88, 0.4) 0%, transparent 100%);
+}
+
+.btn-chevron {
+  display: inline-block;
+  font-size: 18px;
+  font-weight: 900;
+  margin-left: 4px;
+  transition: transform 0.2s ease;
+}
+
+.day-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 /* Main Content Area */
@@ -136,11 +359,11 @@ input, textarea, select {
 /* Day Hero Card */
 .day-hero-card {
   background: linear-gradient(140deg, #1c245c 0%, #141a45 100%);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border-color);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
   padding: 24px 20px;
   margin-bottom: 16px;
-  box-shadow: 0 10px 28px rgba(9, 13, 36, 0.5);
+  box-shadow: 0 12px 32px rgba(9, 13, 36, 0.65);
   position: relative;
   overflow: hidden;
 }
@@ -159,22 +382,22 @@ input, textarea, select {
 .day-tag {
   display: inline-block;
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
+  font-weight: 900;
+  letter-spacing: 1.8px;
   color: #ffffff;
   background: var(--primary);
-  padding: 4px 12px;
-  border-radius: 6px;
-  margin-bottom: 10px;
-  box-shadow: 0 2px 10px var(--primary-glow);
+  padding: 5px 14px;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  box-shadow: 0 2px 12px var(--primary-glow);
   text-transform: uppercase;
 }
 
 .day-hero-card h2 {
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 900;
   margin-bottom: 6px;
   color: #fff;
+  letter-spacing: 0.5px;
 }
 
 .day-hero-card p {
@@ -185,7 +408,8 @@ input, textarea, select {
 
 .workout-summary-box {
   background: var(--bg-input);
-  border-radius: var(--radius-md);
+  border-radius: 4px;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
   padding: 14px;
   margin-bottom: 20px;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -205,14 +429,14 @@ input, textarea, select {
 }
 
 .preview-ex-name {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-main);
 }
 
 .preview-ex-detail {
   font-size: 12px;
   color: var(--primary);
-  font-weight: 700;
+  font-weight: 800;
 }
 
 /* Action Buttons */
@@ -228,26 +452,30 @@ input, textarea, select {
   justify-content: center;
   gap: 8px;
   padding: 14px 20px;
-  border-radius: var(--radius-md);
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
   border: none;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
   transition: all 0.15s ease;
   text-decoration: none;
   outline: none;
+  letter-spacing: 0.4px;
 }
 
 .btn:active {
-  transform: scale(0.98);
+  transform: scale(0.97) skewX(-2deg);
 }
 
 .btn-primary {
-  background: var(--primary);
+  background: linear-gradient(135deg, #fc3258 0%, #d81b43 100%);
   color: #ffffff;
-  font-weight: 800;
-  letter-spacing: 0.3px;
-  box-shadow: 0 4px 18px var(--primary-glow);
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  box-shadow: 0 4px 20px var(--primary-glow);
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .btn-primary:active {
@@ -256,35 +484,41 @@ input, textarea, select {
 
 .btn-large {
   padding: 18px 24px;
-  font-size: 17px;
-  border-radius: var(--radius-lg);
+  font-size: 16px;
+  letter-spacing: 0.8px;
 }
 
 .btn-secondary {
   background: var(--bg-card);
   color: var(--text-main);
   border: 1px solid var(--border-color);
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
 }
 
 .btn-secondary:hover {
   background: var(--bg-card-hover);
+  border-color: var(--primary);
 }
 
 .btn-success {
-  background: #00c853;
+  background: linear-gradient(135deg, #00c853 0%, #009624 100%);
   color: #fff;
+  font-weight: 800;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
 }
 
 .btn-outline-danger {
   background: transparent;
   color: var(--danger);
-  border: 1px solid var(--danger);
+  border: 1.5px solid var(--danger);
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  font-weight: 800;
 }
 
 .btn-small {
   padding: 8px 14px;
   font-size: 13px;
-  border-radius: var(--radius-sm);
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
 }
 
 .btn-block {
@@ -298,8 +532,8 @@ input, textarea, select {
   gap: 16px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
   padding: 16px;
-  border-radius: var(--radius-md);
 }
 
 .meta-icon {
@@ -336,45 +570,48 @@ input, textarea, select {
 }
 
 .timer-card {
-  background: linear-gradient(135deg, #19202f 0%, #121620 100%);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 16px;
+  background: linear-gradient(135deg, #18204c 0%, #111638 100%);
+  border: 1.5px solid var(--border-color);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  padding: 18px 16px;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  position: relative;
 }
 
 .timer-label {
   display: block;
   font-size: 11px;
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
   color: var(--text-muted);
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 4px;
 }
 
 .timer-display {
-  font-size: 38px;
+  font-size: 40px;
   font-weight: 900;
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
   color: var(--primary);
   font-variant-numeric: tabular-nums;
   display: block;
+  text-shadow: 0 0 20px var(--primary-glow);
 }
 
 .progress-bar-container {
   width: 100%;
   height: 8px;
   background: rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
+  border-radius: 2px;
   overflow: hidden;
   margin: 10px 0 6px;
+  clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
 }
 
 .progress-bar-fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--primary) 0%, var(--accent-cyan) 100%);
+  background: linear-gradient(90deg, var(--primary) 0%, #ff5277 100%);
   transition: width 0.3s ease;
 }
 
@@ -386,18 +623,22 @@ input, textarea, select {
 .exercise-stepper {
   text-align: center;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-muted);
   margin-top: 8px;
+  letter-spacing: 0.5px;
 }
 
 /* Active Exercise Card */
 .exercise-active-card {
   background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 20px;
+  border: 1.5px solid var(--border-color);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  padding: 22px 20px;
   margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .exercise-header {
@@ -412,13 +653,14 @@ input, textarea, select {
 .exercise-muscle-tag {
   display: inline-block;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 900;
   text-transform: uppercase;
-  color: var(--accent-cyan);
-  background: rgba(0, 229, 255, 0.12);
-  padding: 3px 8px;
-  border-radius: 4px;
+  color: #fff;
+  background: var(--primary);
+  padding: 3px 10px;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
   margin-bottom: 6px;
+  letter-spacing: 0.8px;
 }
 
 .exercise-name {
@@ -507,13 +749,13 @@ input, textarea, select {
 
 .set-input {
   width: 50px;
-  background: #171d44;
+  background: var(--bg-input);
   border: 1px solid var(--border-color);
   color: #fff;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 15px;
   padding: 6px 8px;
-  border-radius: 6px;
+  clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
   text-align: center;
 }
 
@@ -522,7 +764,7 @@ input, textarea, select {
   color: var(--text-muted);
   border: none;
   padding: 8px 12px;
-  border-radius: 6px;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
   font-weight: 800;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -532,13 +774,14 @@ input, textarea, select {
 .set-row.completed .set-btn-check {
   background: var(--primary);
   color: #ffffff;
+  box-shadow: 0 0 12px var(--primary-glow);
 }
 
 /* Rest Timer Box */
 .rest-timer-box {
-  background: #141823;
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  border: 1.5px dashed var(--border-color);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
   padding: 14px;
   margin-bottom: 20px;
 }
@@ -554,8 +797,8 @@ input, textarea, select {
 
 .rest-timer-value {
   font-size: 20px;
-  font-weight: 800;
-  color: var(--accent-cyan);
+  font-weight: 900;
+  color: var(--primary);
   font-variant-numeric: tabular-nums;
 }
 
@@ -570,15 +813,17 @@ input, textarea, select {
   border: 1px solid var(--border-color);
   color: var(--text-main);
   padding: 8px 0;
-  border-radius: 6px;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-.btn-rest:hover {
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
+.btn-rest:hover, .btn-rest:active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
 }
 
 .btn-rest-stop {
@@ -586,9 +831,9 @@ input, textarea, select {
   border: 1px solid var(--danger);
   color: var(--danger);
   padding: 8px 12px;
-  border-radius: 6px;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
 }
 
@@ -602,10 +847,12 @@ input, textarea, select {
 /* Finish View */
 .congrats-card {
   background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border-color);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
   padding: 28px 20px;
   text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .congrats-icon {
@@ -636,7 +883,7 @@ input, textarea, select {
 .stat-box {
   background: var(--bg-input);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
   padding: 14px 8px;
 }
 
@@ -719,24 +966,25 @@ input, textarea, select {
   color: var(--text-muted);
   border: 1px solid var(--border-color);
   padding: 8px 14px;
-  border-radius: 20px;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
+  letter-spacing: 0.4px;
 }
 
 .day-pill.active {
   background: var(--primary);
   color: #ffffff;
   border-color: var(--primary);
-  box-shadow: 0 2px 12px var(--primary-glow);
+  box-shadow: 0 2px 14px var(--primary-glow);
 }
 
 .routine-editor-card {
   background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 20px;
+  border: 1.5px solid var(--border-color);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  padding: 22px 20px;
 }
 
 .routine-meta-inputs {
@@ -840,11 +1088,11 @@ input, textarea, select {
 }
 
 .routine-mini-input input {
-  background: #1b212f;
+  background: var(--bg-input);
   border: 1px solid var(--border-color);
   color: #fff;
   padding: 8px;
-  border-radius: 6px;
+  clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
   font-size: 13px;
   font-weight: 700;
   text-align: center;
@@ -885,17 +1133,19 @@ input, textarea, select {
   background: var(--bg-card);
   color: var(--text-muted);
   border: 1px solid var(--border-color);
-  padding: 6px 12px;
-  border-radius: 16px;
+  padding: 6px 14px;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
+  letter-spacing: 0.3px;
 }
 
 .chip.active {
-  background: rgba(0, 229, 255, 0.15);
-  color: var(--accent-cyan);
-  border-color: var(--accent-cyan);
+  background: rgba(252, 50, 88, 0.2);
+  color: var(--primary);
+  border-color: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
 }
 
 .catalog-list {
@@ -907,7 +1157,7 @@ input, textarea, select {
 .catalog-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
   padding: 14px 16px;
   display: flex;
   justify-content: space-between;
@@ -951,7 +1201,7 @@ input, textarea, select {
 .history-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
   padding: 16px;
 }
 
@@ -1018,7 +1268,7 @@ input, textarea, select {
 .settings-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
   padding: 18px;
   margin-bottom: 16px;
 }
@@ -1066,14 +1316,15 @@ input, textarea, select {
   bottom: 0;
   left: 0;
   right: 0;
-  background: #141722;
-  border-top: 1px solid var(--border-color);
+  background: #111638;
+  border-top: 2px solid var(--border-color);
   display: flex;
   justify-content: space-around;
-  padding: 6px 4px;
+  padding: 8px 4px 6px;
   z-index: 100;
   max-width: 600px;
   margin: 0 auto;
+  backdrop-filter: blur(12px);
 }
 
 .nav-item {
@@ -1082,31 +1333,41 @@ input, textarea, select {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   color: var(--text-muted);
   cursor: pointer;
   padding: 4px 2px;
-  border-radius: var(--radius-sm);
   transition: all 0.15s ease;
   flex: 1;
   min-width: 0;
+  position: relative;
 }
 
 .nav-item.active {
   color: var(--primary);
 }
 
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  width: 24px;
+  height: 3px;
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
+  clip-path: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%);
+}
+
 .nav-icon {
-  font-size: 19px;
+  font-size: 20px;
+  line-height: 1;
 }
 
 .nav-label {
-  font-size: 10px;
-  font-weight: 700;
-  white-space: nowrap;
-}
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
 }
 
 /* Modals */
@@ -1127,13 +1388,13 @@ input, textarea, select {
 
 .modal-dialog {
   background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border-color);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
   width: 100%;
   max-width: 480px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 16px 36px rgba(0,0,0,0.5);
+  box-shadow: 0 20px 48px rgba(0,0,0,0.7);
   animation: modalScale 0.2s ease-out;
 }
 
@@ -1320,11 +1581,13 @@ input, textarea, select {
 
 /* Streak Card (Ofensiva Semanal) */
 .streak-card {
-  background: linear-gradient(135deg, #1d212d 0%, #151821 100%);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 14px 16px;
+  background: linear-gradient(135deg, #18204c 0%, #111638 100%);
+  border: 1.5px solid var(--border-color);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  padding: 16px 18px;
   margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
 }
 
 .streak-header {
@@ -1347,15 +1610,17 @@ input, textarea, select {
 }
 
 .streak-badge strong {
-  color: var(--accent-orange);
+  color: var(--primary);
   font-size: 16px;
+  font-weight: 900;
 }
 
 .streak-week-label {
   font-size: 11px;
   color: var(--text-muted);
   text-transform: uppercase;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.5px;
 }
 
 .streak-days-row {
@@ -1373,7 +1638,7 @@ input, textarea, select {
   background: var(--bg-input);
   border: 1px solid var(--border-color);
   padding: 8px 4px;
-  border-radius: 8px;
+  clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
   transition: all 0.2s ease;
 }
 
@@ -1391,7 +1656,7 @@ input, textarea, select {
 .streak-day-status {
   width: 22px;
   height: 22px;
-  border-radius: 50%;
+  clip-path: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%);
   background: rgba(255, 255, 255, 0.06);
   display: flex;
   align-items: center;
@@ -1402,8 +1667,8 @@ input, textarea, select {
 }
 
 .streak-day-item.done {
-  background: rgba(252, 50, 88, 0.12);
-  border-color: rgba(252, 50, 88, 0.45);
+  background: rgba(252, 50, 88, 0.15);
+  border-color: rgba(252, 50, 88, 0.5);
 }
 
 .streak-day-item.done .streak-day-status {
@@ -1544,26 +1809,29 @@ input, textarea, select {
 
 /* Weight Tracker Styles */
 .weight-hero-card {
-  background: linear-gradient(135deg, #18222f 0%, #121822 100%);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 20px;
+  background: linear-gradient(140deg, #1c245c 0%, #141a45 100%);
+  border: 1.5px solid var(--border-color);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  padding: 22px 20px;
   margin-bottom: 16px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 12px 32px rgba(9, 13, 36, 0.65);
+  position: relative;
+  overflow: hidden;
 }
 
 .weight-loss-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(0, 230, 118, 0.15);
-  border: 1px solid rgba(0, 230, 118, 0.35);
+  background: rgba(252, 50, 88, 0.15);
+  border: 1px solid rgba(252, 50, 88, 0.45);
   color: var(--primary);
   font-size: 16px;
-  font-weight: 800;
-  padding: 6px 14px;
-  border-radius: 20px;
+  font-weight: 900;
+  padding: 6px 16px;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
   margin-bottom: 16px;
+  letter-spacing: 0.5px;
 }
 
 .weight-metrics-grid {
@@ -1576,14 +1844,14 @@ input, textarea, select {
 .weight-metric-box {
   background: var(--bg-input);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
   padding: 12px 8px;
   text-align: center;
 }
 
 .weight-metric-box.highlight {
-  border-color: var(--accent-cyan);
-  background: rgba(0, 229, 255, 0.08);
+  border-color: var(--primary);
+  background: rgba(252, 50, 88, 0.12);
 }
 
 .weight-metric-label {
@@ -1602,14 +1870,15 @@ input, textarea, select {
 }
 
 .weight-metric-box.highlight .weight-metric-value {
-  color: var(--accent-cyan);
-  font-size: 20px;
+  color: var(--primary);
+  font-size: 21px;
+  text-shadow: 0 0 14px var(--primary-glow);
 }
 
 .weight-progress-box {
-  background: rgba(0, 0, 0, 0.25);
-  border-radius: var(--radius-sm);
-  padding: 12px;
+  background: rgba(0, 0, 0, 0.35);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  padding: 14px;
 }
 
 .weight-progress-info {
@@ -1622,6 +1891,7 @@ input, textarea, select {
 
 .weight-progress-info strong {
   color: var(--primary);
+  font-weight: 800;
 }
 
 .weight-remaining-text {
@@ -1635,17 +1905,18 @@ input, textarea, select {
 /* Record Weight Card */
 .record-weight-card {
   background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border-color);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
   padding: 18px;
   margin-bottom: 16px;
 }
 
 .record-weight-card h3 {
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 900;
   margin-bottom: 14px;
   color: #fff;
+  letter-spacing: 0.5px;
 }
 
 .weight-stepper {
@@ -1655,18 +1926,20 @@ input, textarea, select {
 }
 
 .btn-step {
-  background: var(--bg-input);
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   color: var(--text-main);
   padding: 10px 14px;
-  border-radius: var(--radius-sm);
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
   font-size: 13px;
   font-weight: 800;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .btn-step:active {
-  background: var(--bg-card-hover);
+  background: var(--primary);
+  color: #fff;
 }
 
 .weight-input-wrapper {
