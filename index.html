@@ -91,6 +91,9 @@
                 <div class="exercise-equipment" id="live-exercise-equip">
                   <span>Equipamento:</span> <strong id="live-equip-name">Barra / Banco</strong>
                 </div>
+                <button id="btn-show-gif-live" class="btn-gif-trigger mt-2">
+                  <span>🎬</span> Ver Como Executar (GIF)
+                </button>
               </div>
               <div class="exercise-time-badge">
                 <span class="badge-label">Neste exercício</span>
@@ -401,6 +404,25 @@
       <div class="modal-body">
         <div class="switch-day-list" id="switch-day-options">
           <!-- Opções dos treinos da semana para iniciar hoje -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Visualizador de GIF de Execução -->
+  <div id="modal-gif" class="modal-backdrop hidden">
+    <div class="modal-dialog gif-modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-gif-title">Execução do Exercício</h3>
+        <button class="modal-close" id="btn-close-modal-gif">&times;</button>
+      </div>
+      <div class="modal-body gif-modal-body">
+        <div class="gif-frame">
+          <img id="modal-gif-img" src="" alt="Execução do exercício" class="exercise-gif-display">
+        </div>
+        <div class="gif-instructions-box">
+          <div class="instructions-label">💡 DICAS DE POSTURA & EXECUÇÃO:</div>
+          <p id="modal-gif-notes">Instruções</p>
         </div>
       </div>
     </div>

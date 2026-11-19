@@ -2,44 +2,242 @@
 // Gerenciamento de exercícios, rotinas semanais, execução de treino com cronômetros e histórico
 
 // --- 1. DADOS INICIAIS (SEED - TREINO PUSH / PULL / LEGS / UPPER / LOWER) ---
+const GIF_BASE = 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/';
+
 const DEFAULT_EXERCISES = [
   // PUSH / Peito, Ombros, Tríceps
-  { id: 'ex-1', name: 'Supino reto com barra', muscle: 'Peito', equipment: 'Barra e Banco', notes: 'Manter escápulas aduzidas e pés firmes no chão' },
-  { id: 'ex-2', name: 'Supino inclinado com halteres', muscle: 'Peito', equipment: 'Halteres e Banco 30º', notes: 'Foco na porção superior do peitoral' },
-  { id: 'ex-3', name: 'Desenvolvimento com halteres', muscle: 'Ombros', equipment: 'Halteres e Banco', notes: 'Não arquear excessivamente a lombar' },
-  { id: 'ex-4', name: 'Elevação lateral com halteres', muscle: 'Ombros', equipment: 'Halteres', notes: 'Subir até a altura dos ombros de forma controlada' },
-  { id: 'ex-5', name: 'Tríceps na polia com corda', muscle: 'Tríceps', equipment: 'Polia Alta', notes: 'Abrir a corda no final estendendo bem' },
-  { id: 'ex-6', name: 'Tríceps francês na polia', muscle: 'Tríceps', equipment: 'Polia Baixa / Média', notes: 'Cotovelos estáveis apontando para frente' },
+  { 
+    id: 'ex-1', 
+    name: 'Supino reto com barra', 
+    muscle: 'Peito', 
+    equipment: 'Barra e Banco', 
+    notes: 'Manter escápulas aduzidas e pés firmes no chão. Descer a barra na linha dos mamilos sem bater no peito.',
+    gifUrl: GIF_BASE + 'pectorals/barbell-bench-press.gif'
+  },
+  { 
+    id: 'ex-2', 
+    name: 'Supino inclinado com halteres', 
+    muscle: 'Peito', 
+    equipment: 'Halteres e Banco 30º', 
+    notes: 'Foco na porção superior do peitoral. Manter banco inclinado a 30-45 graus e cotovelos a 45 graus.',
+    gifUrl: GIF_BASE + 'pectorals/dumbbell-incline-bench-press.gif'
+  },
+  { 
+    id: 'ex-3', 
+    name: 'Desenvolvimento com halteres', 
+    muscle: 'Ombros', 
+    equipment: 'Halteres e Banco', 
+    notes: 'Não arquear excessivamente a lombar. Elevar os halteres até quase se tocarem no topo.',
+    gifUrl: GIF_BASE + 'delts/dumbbell-seated-shoulder-press.gif'
+  },
+  { 
+    id: 'ex-4', 
+    name: 'Elevação lateral com halteres', 
+    muscle: 'Ombros', 
+    equipment: 'Halteres', 
+    notes: 'Subir até a altura dos ombros de forma controlada. Cotovelos levemente flexionados.',
+    gifUrl: GIF_BASE + 'delts/dumbbell-lateral-raise.gif'
+  },
+  { 
+    id: 'ex-5', 
+    name: 'Tríceps na polia com corda', 
+    muscle: 'Tríceps', 
+    equipment: 'Polia Alta', 
+    notes: 'Cotovelos travados ao lado do corpo. Abrir a corda no final estendendo completamente.',
+    gifUrl: GIF_BASE + 'triceps/cable-triceps-pushdown-v-bar.gif'
+  },
+  { 
+    id: 'ex-6', 
+    name: 'Tríceps francês na polia', 
+    muscle: 'Tríceps', 
+    equipment: 'Polia Baixa / Média', 
+    notes: 'Cotovelos estáveis apontando para a frente. Movimento apenas do antebraço.',
+    gifUrl: GIF_BASE + 'triceps/cable-overhead-triceps-extension-rope-attachment.gif'
+  },
 
   // PULL / Costas, Ombros Posterior, Bíceps
-  { id: 'ex-7', name: 'Puxada alta na polia', muscle: 'Costas', equipment: 'Polia Alta', notes: 'Puxar direcionando cotovelos para o chão, peito estufado' },
-  { id: 'ex-8', name: 'Remada baixa com triângulo', muscle: 'Costas', equipment: 'Polia / Máquina', notes: 'Manter coluna ereta e puxar em direção ao umbigo' },
-  { id: 'ex-9', name: 'Remada com halteres apoiado no banco', muscle: 'Costas', equipment: 'Halteres e Banco Inclinado', notes: 'Peito apoiado no banco, alívio total na lombar' },
-  { id: 'ex-10', name: 'Crucifixo inverso na máquina', muscle: 'Ombros', equipment: 'Máquina Peck Deck Inverso', notes: 'Foco no deltóide posterior' },
-  { id: 'ex-11', name: 'Rosca direta com barra', muscle: 'Bíceps', equipment: 'Barra W ou Reta', notes: 'Cotovelos colados ao corpo sem balançar o tronco' },
-  { id: 'ex-12', name: 'Rosca martelo com halteres', muscle: 'Bíceps', equipment: 'Halteres', notes: 'Pegada neutra, fortalece braquial e antebraço' },
+  { 
+    id: 'ex-7', 
+    name: 'Puxada alta na polia', 
+    muscle: 'Costas', 
+    equipment: 'Polia Alta', 
+    notes: 'Puxar direcionando os cotovelos para o chão, com o peito estufado e tronco levemente inclinado.',
+    gifUrl: GIF_BASE + 'lats/cable-lat-pulldown-full-range-of-motion.gif'
+  },
+  { 
+    id: 'ex-8', 
+    name: 'Remada baixa com triângulo', 
+    muscle: 'Costas', 
+    equipment: 'Polia / Máquina', 
+    notes: 'Manter coluna ereta e puxar em direção ao umbigo, esmagando as costas no final.',
+    gifUrl: GIF_BASE + 'upper-back/cable-low-seated-row.gif'
+  },
+  { 
+    id: 'ex-9', 
+    name: 'Remada com halteres apoiado no banco', 
+    muscle: 'Costas', 
+    equipment: 'Halteres e Banco Inclinado', 
+    notes: 'Peito apoiado no banco, alívio total na lombar. Puxar cotovelos apontando para trás.',
+    gifUrl: GIF_BASE + 'upper-back/dumbbell-incline-row.gif'
+  },
+  { 
+    id: 'ex-10', 
+    name: 'Crucifixo inverso na máquina', 
+    muscle: 'Ombros', 
+    equipment: 'Máquina Peck Deck Inverso', 
+    notes: 'Foco no deltóide posterior. Manter cotovelos na altura dos ombros.',
+    gifUrl: GIF_BASE + 'delts/lever-seated-reverse-fly-parallel-grip.gif'
+  },
+  { 
+    id: 'ex-11', 
+    name: 'Rosca direta com barra', 
+    muscle: 'Bíceps', 
+    equipment: 'Barra W ou Reta', 
+    notes: 'Cotovelos colados ao corpo sem balançar o tronco. Foco na contração do bíceps.',
+    gifUrl: GIF_BASE + 'biceps/barbell-curl.gif'
+  },
+  { 
+    id: 'ex-12', 
+    name: 'Rosca martelo com halteres', 
+    muscle: 'Bíceps', 
+    equipment: 'Halteres', 
+    notes: 'Pegada neutra (palmas viradas uma para a outra). Fortalece o braquial e antebraço.',
+    gifUrl: GIF_BASE + 'biceps/dumbbell-alternate-seated-hammer-curl.gif'
+  },
 
   // LEGS / Pernas, Glúteos, Panturrilha
-  { id: 'ex-13', name: 'Agachamento com barra', muscle: 'Pernas', equipment: 'Barra Olímpica / Suporte', notes: 'Pés na largura dos ombros, descida controlada' },
-  { id: 'ex-14', name: 'Leg press 45°', muscle: 'Pernas', equipment: 'Máquina', notes: 'Costas bem apoiadas, não travar o joelho no topo' },
-  { id: 'ex-15', name: 'Cadeira extensora', muscle: 'Pernas', equipment: 'Máquina', notes: 'Segurar 1 segundo no topo contraindo a coxa' },
-  { id: 'ex-16', name: 'Mesa ou cadeira flexora', muscle: 'Pernas', equipment: 'Máquina', notes: 'Contração firme na parte posterior da perna' },
-  { id: 'ex-17', name: 'Elevação pélvica', muscle: 'Pernas', equipment: 'Barra ou Banco / Máquina', notes: 'Aperto máximo nos glúteos no ponto mais alto' },
-  { id: 'ex-18', name: 'Panturrilha em pé na máquina', muscle: 'Pernas', equipment: 'Máquina / Degrau', notes: 'Amplitude total: alongar bem embaixo e subir tudo' },
+  { 
+    id: 'ex-13', 
+    name: 'Agachamento com barra', 
+    muscle: 'Pernas', 
+    equipment: 'Barra Olímpica / Suporte', 
+    notes: 'Pés na largura dos ombros, descida controlada empurrando o quadril para trás. Joelhos alinhados às pontas dos pés.',
+    gifUrl: GIF_BASE + 'glutes/barbell-full-squat.gif'
+  },
+  { 
+    id: 'ex-14', 
+    name: 'Leg press 45°', 
+    muscle: 'Pernas', 
+    equipment: 'Máquina', 
+    notes: 'Costas bem apoiadas no encosto. Descer em 90 graus e nunca travar (estalar) os joelhos no topo.',
+    gifUrl: GIF_BASE + 'calves/lever-seated-squat-calf-raise-on-leg-press-machine.gif'
+  },
+  { 
+    id: 'ex-15', 
+    name: 'Cadeira extensora', 
+    muscle: 'Pernas', 
+    equipment: 'Máquina', 
+    notes: 'Segurar 1 segundo no topo contraindo a coxa (quadríceps). Descida lenta.',
+    gifUrl: GIF_BASE + 'quads/lever-leg-extension.gif'
+  },
+  { 
+    id: 'ex-16', 
+    name: 'Mesa ou cadeira flexora', 
+    muscle: 'Pernas', 
+    equipment: 'Máquina', 
+    notes: 'Contração firme na parte posterior da coxa sem levantar o quadril do banco.',
+    gifUrl: GIF_BASE + 'hamstrings/lever-kneeling-leg-curl.gif'
+  },
+  { 
+    id: 'ex-17', 
+    name: 'Elevação pélvica', 
+    muscle: 'Pernas', 
+    equipment: 'Barra ou Banco / Máquina', 
+    notes: 'Aperto máximo nos glúteos no ponto mais alto. Manter queixo próximo ao peito.',
+    gifUrl: GIF_BASE + 'glutes/barbell-glute-bridge.gif'
+  },
+  { 
+    id: 'ex-18', 
+    name: 'Panturrilha em pé na máquina', 
+    muscle: 'Pernas', 
+    equipment: 'Máquina / Degrau', 
+    notes: 'Amplitude total: alongar bem embaixo e subir tudo na ponta dos pés.',
+    gifUrl: GIF_BASE + 'calves/barbell-standing-calf-raise.gif'
+  },
 
   // UPPER / Superior Completo
-  { id: 'ex-19', name: 'Supino inclinado na máquina', muscle: 'Peito', equipment: 'Máquina Articulada', notes: 'Movimento guiado e seguro para peitoral superior' },
-  { id: 'ex-20', name: 'Puxada alta com pegada neutra', muscle: 'Costas', equipment: 'Polia e Triângulo Neutro', notes: 'Ótima amplitude e conforto nos punhos e ombros' },
-  { id: 'ex-21', name: 'Remada unilateral com halter', muscle: 'Costas', equipment: 'Halter e Banco', notes: 'Puxar o halter rente ao corpo focando na dorsal' },
-  { id: 'ex-22', name: 'Elevação lateral na polia', muscle: 'Ombros', equipment: 'Polia Baixa', notes: 'Tensão constante em toda a amplitude' },
-  { id: 'ex-23', name: 'Rosca inclinada com halteres', muscle: 'Bíceps', equipment: 'Halteres e Banco 45º', notes: 'Alongamento máximo do bíceps no início' },
+  { 
+    id: 'ex-19', 
+    name: 'Supino inclinado na máquina', 
+    muscle: 'Peito', 
+    equipment: 'Máquina Articulada', 
+    notes: 'Movimento guiado e seguro para peitoral superior. Ajuste a altura do banco.',
+    gifUrl: GIF_BASE + 'pectorals/lever-incline-chest-press-v-2.gif'
+  },
+  { 
+    id: 'ex-20', 
+    name: 'Puxada alta com pegada neutra', 
+    muscle: 'Costas', 
+    equipment: 'Polia e Triângulo Neutro', 
+    notes: 'Ótima amplitude e conforto nos punhos e ombros. Puxar até a parte superior do peito.',
+    gifUrl: GIF_BASE + 'lats/cable-lat-pulldown-full-range-of-motion.gif'
+  },
+  { 
+    id: 'ex-21', 
+    name: 'Remada unilateral com halter', 
+    muscle: 'Costas', 
+    equipment: 'Halter e Banco', 
+    notes: 'Puxar o halter em direção ao quadril mantendo as costas retas.',
+    gifUrl: GIF_BASE + 'upper-back/dumbbell-reverse-grip-incline-bench-one-arm-row.gif'
+  },
+  { 
+    id: 'ex-22', 
+    name: 'Elevação lateral na polia', 
+    muscle: 'Ombros', 
+    equipment: 'Polia Baixa', 
+    notes: 'Tensão constante em toda a amplitude. Puxar na linha do corpo até a altura do ombro.',
+    gifUrl: GIF_BASE + 'delts/cable-lateral-raise.gif'
+  },
+  { 
+    id: 'ex-23', 
+    name: 'Rosca inclinada com halteres', 
+    muscle: 'Bíceps', 
+    equipment: 'Halteres e Banco 45º', 
+    notes: 'Alongamento máximo do bíceps no início do movimento. Deixar os braços estenderem bem.',
+    gifUrl: GIF_BASE + 'biceps/dumbbell-incline-curl-v-2.gif'
+  },
 
   // LOWER / Inferior e Core
-  { id: 'ex-24', name: 'Levantamento terra romeno com halteres', muscle: 'Pernas', equipment: 'Halteres', notes: 'Quadril para trás, coluna reta, joelhos semiflexionados' },
-  { id: 'ex-25', name: 'Afundo reverso', muscle: 'Pernas', equipment: 'Halteres ou Peso Corporal', notes: 'Passo largo para trás, 90º nos dois joelhos' },
-  { id: 'ex-26', name: 'Cadeira abdutora', muscle: 'Pernas', equipment: 'Máquina', notes: 'Tronco firme, foco em glúteo médio' },
-  { id: 'ex-27', name: 'Panturrilha sentada', muscle: 'Pernas', equipment: 'Máquina de Panturrilha', notes: 'Foco no músculo sóleo da panturrilha' },
-  { id: 'ex-28', name: 'Abdominal crunch', muscle: 'Abdômen', equipment: 'Colchonete / Solo', notes: 'Aproximar costelas do quadril sem forçar o pescoço' }
+  { 
+    id: 'ex-24', 
+    name: 'Levantamento terra romeno com halteres', 
+    muscle: 'Pernas', 
+    equipment: 'Halteres', 
+    notes: 'Quadril para trás, coluna reta, joelhos semiflexionados. Sentir os posteriores de coxa alongarem.',
+    gifUrl: GIF_BASE + 'glutes/dumbbell-romanian-deadlift.gif'
+  },
+  { 
+    id: 'ex-25', 
+    name: 'Afundo reverso', 
+    muscle: 'Pernas', 
+    equipment: 'Halteres ou Peso Corporal', 
+    notes: 'Passo largo para trás, 90º nos dois joelhos. Tronco levemente inclinado para frente.',
+    gifUrl: GIF_BASE + 'glutes/dumbbell-rear-lunge.gif'
+  },
+  { 
+    id: 'ex-26', 
+    name: 'Cadeira abdutora', 
+    muscle: 'Pernas', 
+    equipment: 'Máquina', 
+    notes: 'Tronco firme encostado no banco. Abrir as pernas até a contração máxima do glúteo médio.',
+    gifUrl: GIF_BASE + 'abductors/lever-seated-hip-abduction.gif'
+  },
+  { 
+    id: 'ex-27', 
+    name: 'Panturrilha sentada', 
+    muscle: 'Pernas', 
+    equipment: 'Máquina de Panturrilha', 
+    notes: 'Foco no músculo sóleo. Descer o calcanhar ao máximo e subir até contrair bem.',
+    gifUrl: GIF_BASE + 'calves/lever-seated-calf-raise.gif'
+  },
+  { 
+    id: 'ex-28', 
+    name: 'Abdominal crunch', 
+    muscle: 'Abdômen', 
+    equipment: 'Colchonete / Solo', 
+    notes: 'Aproximar costelas do quadril sem forçar o pescoço com as mãos. Soltar o ar ao subir.',
+    gifUrl: GIF_BASE + 'abs/crunch-floor.gif'
+  }
 ];
 
 const DEFAULT_ROUTINES = {
@@ -175,7 +373,7 @@ function playBeep() {
 function loadData() {
   try {
     const versionKey = 'mt_app_version';
-    const currentVersion = '2.0-pplul';
+    const currentVersion = '2.1-gifs';
     const savedVersion = localStorage.getItem(versionKey);
 
     const rawEx = localStorage.getItem('mt_exercises');
@@ -346,6 +544,14 @@ function setupTodayTab() {
   // Controles do Treino Ativo
   document.getElementById('btn-next-exercise').addEventListener('click', nextExercise);
   document.getElementById('btn-prev-exercise').addEventListener('click', prevExercise);
+  document.getElementById('btn-show-gif-live').addEventListener('click', () => {
+    if (!state.activeWorkout) return;
+    const curIdx = state.activeWorkout.currentExerciseIndex;
+    const curEx = state.activeWorkout.exercisesData[curIdx];
+    if (curEx) {
+      openGifModal(curEx.exerciseName, curEx.gifUrl, curEx.notes);
+    }
+  });
   document.getElementById('btn-finish-workout-early').addEventListener('click', () => {
     if (confirm('Deseja realmente finalizar o treino agora?')) {
       finishWorkoutSession();
@@ -421,6 +627,8 @@ function startWorkoutSession(dayKey) {
         exerciseName: ex.name || 'Exercício',
         muscle: ex.muscle || '',
         equipment: ex.equipment || '',
+        gifUrl: ex.gifUrl || '',
+        notes: ex.notes || '',
         setsConfig: item.sets,
         targetReps: item.reps,
         targetWeight: item.weight,
@@ -957,10 +1165,18 @@ function renderExercisesCatalog() {
         </div>
       </div>
       <div class="catalog-actions">
+        ${ex.gifUrl ? `<button class="btn btn-small btn-secondary btn-gif-ex" title="Ver Execução (GIF)">🎬</button>` : ''}
         <button class="btn btn-small btn-secondary btn-edit-ex" data-id="${ex.id}">✏️</button>
         <button class="btn btn-small btn-outline-danger btn-del-ex" data-id="${ex.id}">🗑️</button>
       </div>
     `;
+
+    // Ver GIF no catálogo
+    if (ex.gifUrl) {
+      card.querySelector('.btn-gif-ex').addEventListener('click', () => {
+        openGifModal(ex.name, ex.gifUrl, ex.notes);
+      });
+    }
 
     // Editar
     card.querySelector('.btn-edit-ex').addEventListener('click', () => {
@@ -1120,7 +1336,28 @@ function setupSettingsTab() {
 }
 
 // --- 10. MODAIS GERAIS ---
+function openGifModal(name, gifUrl, notes) {
+  document.getElementById('modal-gif-title').textContent = name;
+  const img = document.getElementById('modal-gif-img');
+  img.src = gifUrl || '';
+  document.getElementById('modal-gif-notes').textContent = notes || 'Mantenha a postura alinhada, escápulas travadas e controle em toda a amplitude.';
+  document.getElementById('modal-gif').classList.remove('hidden');
+}
+
 function setupModals() {
+  // Modal de GIF
+  const modalGif = document.getElementById('modal-gif');
+  document.getElementById('btn-close-modal-gif').addEventListener('click', () => {
+    modalGif.classList.add('hidden');
+    document.getElementById('modal-gif-img').src = '';
+  });
+  modalGif.addEventListener('click', (e) => {
+    if (e.target === modalGif) {
+      modalGif.classList.add('hidden');
+      document.getElementById('modal-gif-img').src = '';
+    }
+  });
+
   // Modal de Exercício
   document.getElementById('btn-close-modal-exercise').addEventListener('click', () => {
     document.getElementById('modal-exercise').classList.add('hidden');
