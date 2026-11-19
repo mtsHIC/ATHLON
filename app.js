@@ -1424,14 +1424,19 @@ function renderHistoryList() {
       </div>
     `;
 
-    // Excluir treino individual
+    // Excluir treino individual com confirmação segura
     card.querySelector('.btn-del-history-item').addEventListener('click', () => {
-      if (confirm('Deseja excluir este treino do histórico?')) {
-        state.history = state.history.filter(item => item.id !== h.id);
-        saveHistory();
-        renderHistoryList();
-        updateStreakDisplay();
-      }
+      openConfirmDeleteModal({
+        title: 'Excluir Treino',
+        message: `Deseja realmente apagar o registro do treino <strong>${h.routineName || 'Treino'}</strong> realizado em ${dateFormatted} às ${timeFormatted}?`,
+        requireTyping: false,
+        onConfirm: () => {
+          state.history = state.history.filter(item => item.id !== h.id);
+          saveHistory();
+          renderHistoryList();
+          updateStreakDisplay();
+        }
+      });
     });
 
     container.appendChild(card);
@@ -1506,15 +1511,20 @@ function setupSettingsTab() {
     reader.readAsText(file);
   });
 
-  // Limpar todo o histórico de treinos
+  // Limpar todo o histórico de treinos com dupla verificação
   document.getElementById('btn-clear-history').addEventListener('click', () => {
-    if (confirm('Tem certeza de que deseja apagar TODO o histórico de treinos? Essa ação não pode ser desfeita.')) {
-      state.history = [];
-      saveHistory();
-      renderHistoryList();
-      updateStreakDisplay();
-      alert('Histórico de treinos apagado com sucesso!');
-    }
+    openConfirmDeleteModal({
+      title: '⚠️ Excluir Todo o Histórico',
+      message: 'Esta ação irá <strong>apagar definitivamente</strong> todos os registros de treinos passados e resetar sua contagem de ofensiva semanal.',
+      requireTyping: true,
+      onConfirm: () => {
+        state.history = [];
+        saveHistory();
+        renderHistoryList();
+        updateStreakDisplay();
+        alert('Histórico de treinos apagado com sucesso!');
+      }
+    });
   });
 
   // Restaurar dados padrão
@@ -1531,6 +1541,45 @@ function setupSettingsTab() {
 }
 
 // --- 10. MODAIS GERAIS ---
+let pendingDeleteAction = null;
+
+function openConfirmDeleteModal({ title, message, requireTyping = false, onConfirm }) {
+  document.getElementById('modal-confirm-title').textContent = title;
+  document.getElementById('modal-confirm-msg').innerHTML = message;
+  
+  const typeContainer = document.getElementById('confirm-type-container');
+  const inputKeyword = document.getElementById('input-confirm-keyword');
+  const btnExec = document.getElementById('btn-execute-confirm');
+
+  inputKeyword.value = '';
+  pendingDeleteAction = onConfirm;
+
+  if (requireTyping) {
+    typeContainer.classList.remove('hidden');
+    btnExec.classList.add('btn-disabled');
+    btnExec.textContent = 'Excluir Definitivamente';
+
+    inputKeyword.oninput = () => {
+      const isMatch = inputKeyword.value.trim().toUpperCase() === 'EXCLUIR';
+      if (isMatch) {
+        btnExec.classList.remove('btn-disabled');
+      } else {
+        btnExec.classList.add('btn-disabled');
+      }
+    };
+  } else {
+    typeContainer.classList.add('hidden');
+    btnExec.classList.remove('btn-disabled');
+    btnExec.textContent = 'Sim, Excluir';
+    inputKeyword.oninput = null;
+  }
+
+  document.getElementById('modal-confirm-delete').classList.remove('hidden');
+  if (requireTyping) {
+    setTimeout(() => inputKeyword.focus(), 150);
+  }
+}
+
 function openGifModal(name, gifUrl, notes) {
   document.getElementById('modal-gif-title').textContent = name;
   const img = document.getElementById('modal-gif-img');
@@ -1540,6 +1589,26 @@ function openGifModal(name, gifUrl, notes) {
 }
 
 function setupModals() {
+  // Modal de Confirmação Segura
+  const modalConfirm = document.getElementById('modal-confirm-delete');
+  const closeModalConfirm = () => {
+    modalConfirm.classList.add('hidden');
+    pendingDeleteAction = null;
+  };
+
+  document.getElementById('btn-close-modal-confirm').addEventListener('click', closeModalConfirm);
+  document.getElementById('btn-cancel-confirm').addEventListener('click', closeModalConfirm);
+  modalConfirm.addEventListener('click', (e) => {
+    if (e.target === modalConfirm) closeModalConfirm();
+  });
+
+  document.getElementById('btn-execute-confirm').addEventListener('click', () => {
+    if (typeof pendingDeleteAction === 'function') {
+      pendingDeleteAction();
+    }
+    closeModalConfirm();
+  });
+
   // Modal de Aquecimento
   const modalWarmup = document.getElementById('modal-warmup');
   document.getElementById('btn-close-modal-warmup').addEventListener('click', () => {

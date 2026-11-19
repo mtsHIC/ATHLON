@@ -475,6 +475,32 @@
     </div>
   </div>
 
+  <!-- MODAL: Confirmação de Exclusão Segura -->
+  <div id="modal-confirm-delete" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-confirm-title">⚠️ Confirmação Necessária</h3>
+        <button class="modal-close" id="btn-close-modal-confirm">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-confirm-msg" class="confirm-message">
+          Tem certeza de que deseja excluir?
+        </p>
+
+        <!-- Campo de digitação de segurança (para exclusão total) -->
+        <div id="confirm-type-container" class="confirm-type-box hidden mt-3">
+          <label for="input-confirm-keyword">Para confirmar, digite <strong>EXCLUIR</strong> abaixo:</label>
+          <input type="text" id="input-confirm-keyword" class="form-input mt-2" placeholder="Digite EXCLUIR" autocomplete="off">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-confirm">Cancelar</button>
+          <button type="button" class="btn btn-outline-danger" id="btn-execute-confirm">Excluir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
