@@ -4,8 +4,8 @@
   "description": "Aplicativo de treino offline para academia",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#12141a",
-  "theme_color": "#12141a",
+  "background_color": "#111638",
+  "theme_color": "#111638",
   "orientation": "portrait-primary",
   "icons": [
     {

@@ -1562,17 +1562,17 @@ function renderWeightChart() {
     <svg width="100%" height="${height}" viewBox="0 0 ${width} ${height}" style="overflow: visible;">
       <defs>
         <linearGradient id="weightGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#00e676" stop-opacity="0.3"/>
-          <stop offset="100%" stop-color="#00e676" stop-opacity="0.0"/>
+          <stop offset="0%" stop-color="#fc3258" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#fc3258" stop-opacity="0.0"/>
         </linearGradient>
       </defs>
       <path d="${areaD}" fill="url(#weightGrad)" />
-      <path d="${pathD}" fill="none" stroke="#00e676" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="${pathD}" fill="none" stroke="#fc3258" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
   `;
 
   points.forEach((p) => {
     svg += `
-      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="#00e676" stroke="#0e1117" stroke-width="2"/>
+      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5" fill="#fc3258" stroke="#111638" stroke-width="2"/>
       <text x="${p.x.toFixed(1)}" y="${(p.y - 8).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="800" fill="#f0f4fc">${p.weight}kg</text>
       <text x="${p.x.toFixed(1)}" y="${height - 8}" text-anchor="middle" font-size="10" font-weight="600" fill="#657088">${p.date}</text>
     `;
