@@ -1058,7 +1058,7 @@ input, textarea, select {
   border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: space-around;
-  padding: 8px 10px;
+  padding: 6px 4px;
   z-index: 100;
   max-width: 600px;
   margin: 0 auto;
@@ -1070,13 +1070,14 @@ input, textarea, select {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 4px 2px;
   border-radius: var(--radius-sm);
   transition: all 0.15s ease;
   flex: 1;
+  min-width: 0;
 }
 
 .nav-item.active {
@@ -1084,10 +1085,14 @@ input, textarea, select {
 }
 
 .nav-icon {
-  font-size: 20px;
+  font-size: 19px;
 }
 
 .nav-label {
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
   font-size: 11px;
   font-weight: 700;
 }
@@ -1523,4 +1528,259 @@ input, textarea, select {
   opacity: 0.45 !important;
   pointer-events: none !important;
   cursor: not-allowed !important;
+}
+
+/* Weight Tracker Styles */
+.weight-hero-card {
+  background: linear-gradient(135deg, #18222f 0%, #121822 100%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.weight-loss-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 230, 118, 0.15);
+  border: 1px solid rgba(0, 230, 118, 0.35);
+  color: var(--primary);
+  font-size: 16px;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+}
+
+.weight-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.weight-metric-box {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px 8px;
+  text-align: center;
+}
+
+.weight-metric-box.highlight {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 229, 255, 0.08);
+}
+
+.weight-metric-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.weight-metric-value {
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+}
+
+.weight-metric-box.highlight .weight-metric-value {
+  color: var(--accent-cyan);
+  font-size: 20px;
+}
+
+.weight-progress-box {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+
+.weight-progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.weight-progress-info strong {
+  color: var(--primary);
+}
+
+.weight-remaining-text {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  text-align: center;
+}
+
+/* Record Weight Card */
+.record-weight-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.record-weight-card h3 {
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 14px;
+  color: #fff;
+}
+
+.weight-stepper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-step {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.btn-step:active {
+  background: var(--bg-card-hover);
+}
+
+.weight-input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.weight-big-input {
+  font-size: 22px !important;
+  font-weight: 900 !important;
+  text-align: center !important;
+  padding-right: 35px !important;
+  color: var(--primary) !important;
+}
+
+.weight-unit {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+/* Weight Chart */
+.weight-chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.weight-chart-card h3 {
+  font-size: 15px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+.weight-chart-wrapper {
+  width: 100%;
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Weight History */
+.weight-history-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+}
+
+.weight-history-card h3 {
+  font-size: 15px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+.weight-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.weight-history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.weight-hist-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.weight-hist-val {
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.weight-hist-date {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.weight-hist-note {
+  font-size: 11px;
+  color: var(--accent-cyan);
+  margin-top: 2px;
+}
+
+.weight-hist-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.weight-diff-badge {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.weight-diff-badge.down {
+  background: rgba(0, 230, 118, 0.15);
+  color: var(--primary);
+}
+
+.weight-diff-badge.up {
+  background: rgba(255, 82, 82, 0.15);
+  color: var(--danger);
+}
+
+.weight-diff-badge.equal {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
 }

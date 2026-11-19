@@ -274,7 +274,96 @@
         </div>
       </section>
 
-      <!-- ABA 4: HISTÓRICO -->
+      <!-- ABA 4: PESO / EVOLUÇÃO -->
+      <section id="tab-weight" class="tab-pane">
+        <div class="section-header-row">
+          <div>
+            <h2>Controle de Peso</h2>
+            <p>Acompanhe sua perda de peso e evolução</p>
+          </div>
+          <button id="btn-open-weight-goal-modal" class="btn btn-secondary btn-small">
+            🎯 Definir Metas
+          </button>
+        </div>
+
+        <!-- Card Principal de Destaque da Perda de Peso -->
+        <div class="weight-hero-card">
+          <div class="weight-loss-badge">
+            <span class="fire-icon">🔥</span>
+            <span id="weight-total-lost-text">0.0 kg perdidos</span>
+          </div>
+
+          <div class="weight-metrics-grid">
+            <div class="weight-metric-box">
+              <span class="weight-metric-label">Peso Inicial</span>
+              <strong class="weight-metric-value" id="disp-weight-initial">-- kg</strong>
+            </div>
+            <div class="weight-metric-box highlight">
+              <span class="weight-metric-label">Peso Atual</span>
+              <strong class="weight-metric-value" id="disp-weight-current">-- kg</strong>
+            </div>
+            <div class="weight-metric-box">
+              <span class="weight-metric-label">Meta Alvo</span>
+              <strong class="weight-metric-value" id="disp-weight-target">-- kg</strong>
+            </div>
+          </div>
+
+          <!-- Barra de Progresso da Meta -->
+          <div class="weight-progress-box">
+            <div class="weight-progress-info">
+              <span>Progresso até a meta</span>
+              <strong id="disp-weight-progress-pct">0%</strong>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill" id="weight-progress-bar-fill" style="width: 0%;"></div>
+            </div>
+            <span class="weight-remaining-text" id="disp-weight-remaining">Defina sua meta para começar!</span>
+          </div>
+        </div>
+
+        <!-- Formulário Rápido de Registro de Peso -->
+        <div class="record-weight-card">
+          <h3>+ Registrar Pesagem de Hoje</h3>
+          <form id="form-record-weight" class="record-weight-form">
+            <div class="weight-input-group">
+              <div class="weight-stepper">
+                <button type="button" class="btn-step" id="btn-weight-minus">-0.2</button>
+                <div class="weight-input-wrapper">
+                  <input type="number" step="0.1" id="input-new-weight" class="form-input weight-big-input" required placeholder="Ex: 85.0">
+                  <span class="weight-unit">kg</span>
+                </div>
+                <button type="button" class="btn-step" id="btn-weight-plus">+0.2</button>
+              </div>
+            </div>
+
+            <div class="form-group mt-2">
+              <input type="text" id="input-weight-note" class="form-input" placeholder="Observação (ex: em jejum, pós-treino)">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block mt-3">
+              💾 Salvar Pesagem
+            </button>
+          </form>
+        </div>
+
+        <!-- Gráfico Visual de Evolução -->
+        <div class="weight-chart-card">
+          <h3>📈 Curva de Evolução do Peso</h3>
+          <div class="weight-chart-wrapper" id="weight-chart-wrapper">
+            <!-- SVG dinâmico -->
+          </div>
+        </div>
+
+        <!-- Lista de Pesagens Anteriores -->
+        <div class="weight-history-card">
+          <h3>Histórico de Pesagens</h3>
+          <div class="weight-history-list" id="weight-history-list">
+            <!-- Itens de pesagens com variação -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ABA 5: HISTÓRICO DE TREINOS -->
       <section id="tab-history" class="tab-pane">
         <div class="section-header">
           <h2>Histórico de Treinos</h2>
@@ -350,6 +439,10 @@
         <span class="nav-icon">📋</span>
         <span class="nav-label">Exercícios</span>
       </button>
+      <button class="nav-item" data-tab="tab-weight">
+        <span class="nav-icon">⚖️</span>
+        <span class="nav-label">Peso</span>
+      </button>
       <button class="nav-item" data-tab="tab-history">
         <span class="nav-icon">📊</span>
         <span class="nav-label">Histórico</span>
@@ -359,6 +452,33 @@
         <span class="nav-label">Ajustes</span>
       </button>
     </nav>
+  </div>
+
+  <!-- MODAL: Definir Metas de Peso -->
+  <div id="modal-weight-goals" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>🎯 Metas de Peso e Emagrecimento</h3>
+        <button class="modal-close" id="btn-close-weight-goals">&times;</button>
+      </div>
+      <form id="form-weight-goals" class="modal-body">
+        <div class="form-group">
+          <label for="input-goal-start-weight">Peso Inicial (quando começou) *</label>
+          <input type="number" step="0.1" id="input-goal-start-weight" class="form-input" required placeholder="Ex: 90.0">
+        </div>
+        <div class="form-group">
+          <label for="input-goal-target-weight">Meta de Peso Alvo *</label>
+          <input type="number" step="0.1" id="input-goal-target-weight" class="form-input" required placeholder="Ex: 78.0">
+        </div>
+        <p class="settings-desc">
+          O aplicativo usará essas referências para calcular quantos quilos você já perdeu e a porcentagem até a meta!
+        </p>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-weight-goals">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Metas</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- MODAL: Cadastrar/Editar Exercício no Catálogo -->

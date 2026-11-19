@@ -331,7 +331,8 @@ let state = {
   history: [],
   settings: { goalMinutes: 60 },
   activeDay: 'seg', // Dia selecionado no editor de rotinas
-  activeWorkout: null // Treino em andamento se houver
+  activeWorkout: null, // Treino em andamento se houver
+  weightTracker: { startWeight: null, targetWeight: null, entries: [] }
 };
 
 // Timers de Execução
@@ -396,6 +397,9 @@ function loadData() {
     const rawSettings = localStorage.getItem('mt_settings');
     state.settings = rawSettings ? JSON.parse(rawSettings) : { goalMinutes: 60 };
 
+    const rawWeight = localStorage.getItem('mt_weight_tracker');
+    state.weightTracker = rawWeight ? JSON.parse(rawWeight) : { startWeight: null, targetWeight: null, entries: [] };
+
     const rawActiveWorkout = localStorage.getItem('mt_active_workout');
     state.activeWorkout = rawActiveWorkout ? JSON.parse(rawActiveWorkout) : null;
   } catch (e) {
@@ -404,6 +408,7 @@ function loadData() {
     state.routines = DEFAULT_ROUTINES;
     state.history = [];
     state.settings = { goalMinutes: 60 };
+    state.weightTracker = { startWeight: null, targetWeight: null, entries: [] };
   }
 }
 
@@ -421,6 +426,10 @@ function saveHistory() {
 
 function saveSettings() {
   localStorage.setItem('mt_settings', JSON.stringify(state.settings));
+}
+
+function saveWeightTracker() {
+  localStorage.setItem('mt_weight_tracker', JSON.stringify(state.weightTracker));
 }
 
 function saveActiveWorkoutState() {
@@ -455,6 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupTodayTab();
   setupRoutinesTab();
   setupExercisesTab();
+  setupWeightTab();
   setupHistoryTab();
   setupSettingsTab();
   setupModals();
@@ -510,6 +520,7 @@ function setupNavigation() {
       if (targetId === 'tab-history') renderHistoryList();
       if (targetId === 'tab-exercises') renderExercisesCatalog();
       if (targetId === 'tab-routines') renderRoutineEditor();
+      if (targetId === 'tab-weight') renderWeightView();
     });
   });
 }
@@ -1372,6 +1383,265 @@ function renderExercisesCatalog() {
   });
 }
 
+// --- ABA CONTROLE DE PESO / EMAGRECIMENTO ---
+function setupWeightTab() {
+  const weightInput = document.getElementById('input-new-weight');
+  
+  // Botoes de ajuste rapido -0.2 / +0.2
+  document.getElementById('btn-weight-minus').addEventListener('click', () => {
+    const val = parseFloat(weightInput.value) || 80.0;
+    weightInput.value = (Math.max(20, val - 0.2)).toFixed(1);
+  });
+  document.getElementById('btn-weight-plus').addEventListener('click', () => {
+    const val = parseFloat(weightInput.value) || 80.0;
+    weightInput.value = (val + 0.2).toFixed(1);
+  });
+
+  // Salvar Pesagem
+  document.getElementById('form-record-weight').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const weightVal = parseFloat(weightInput.value);
+    if (!weightVal || weightVal <= 0) return;
+
+    const noteVal = document.getElementById('input-weight-note').value.trim();
+
+    if (state.weightTracker.startWeight === null) {
+      state.weightTracker.startWeight = weightVal;
+    }
+
+    state.weightTracker.entries.unshift({
+      id: 'w-' + Date.now(),
+      date: new Date().toISOString(),
+      weight: weightVal,
+      note: noteVal
+    });
+
+    saveWeightTracker();
+    document.getElementById('input-weight-note').value = '';
+    renderWeightView();
+  });
+
+  // Abrir Modal de Metas
+  document.getElementById('btn-open-weight-goal-modal').addEventListener('click', () => {
+    document.getElementById('input-goal-start-weight').value = state.weightTracker.startWeight || '';
+    document.getElementById('input-goal-target-weight').value = state.weightTracker.targetWeight || '';
+    document.getElementById('modal-weight-goals').classList.remove('hidden');
+  });
+
+  // Fechar Modal de Metas
+  document.getElementById('btn-close-weight-goals').addEventListener('click', () => {
+    document.getElementById('modal-weight-goals').classList.add('hidden');
+  });
+  document.getElementById('btn-cancel-weight-goals').addEventListener('click', () => {
+    document.getElementById('modal-weight-goals').classList.add('hidden');
+  });
+
+  // Salvar Metas
+  document.getElementById('form-weight-goals').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const startW = parseFloat(document.getElementById('input-goal-start-weight').value);
+    const targetW = parseFloat(document.getElementById('input-goal-target-weight').value);
+
+    state.weightTracker.startWeight = startW || null;
+    state.weightTracker.targetWeight = targetW || null;
+
+    saveWeightTracker();
+    document.getElementById('modal-weight-goals').classList.add('hidden');
+    renderWeightView();
+  });
+
+  renderWeightView();
+}
+
+function renderWeightView() {
+  const entries = state.weightTracker.entries || [];
+  const startWeight = state.weightTracker.startWeight;
+  const targetWeight = state.weightTracker.targetWeight;
+  const currentWeight = entries.length > 0 ? entries[0].weight : (startWeight || null);
+
+  const weightInput = document.getElementById('input-new-weight');
+  if (weightInput && !weightInput.value && currentWeight) {
+    weightInput.value = currentWeight.toFixed(1);
+  }
+
+  // Métricas
+  document.getElementById('disp-weight-initial').textContent = startWeight ? `${startWeight.toFixed(1)} kg` : '-- kg';
+  document.getElementById('disp-weight-current').textContent = currentWeight ? `${currentWeight.toFixed(1)} kg` : '-- kg';
+  document.getElementById('disp-weight-target').textContent = targetWeight ? `${targetWeight.toFixed(1)} kg` : '-- kg';
+
+  // Perda total
+  const lostBadge = document.getElementById('weight-total-lost-text');
+  if (startWeight && currentWeight) {
+    const diff = (startWeight - currentWeight).toFixed(1);
+    if (diff > 0) {
+      lostBadge.textContent = `${diff} kg eliminados! 🎉`;
+      lostBadge.style.color = 'var(--primary)';
+    } else if (diff < 0) {
+      lostBadge.textContent = `+${Math.abs(diff)} kg em relação ao início`;
+      lostBadge.style.color = 'var(--accent-orange)';
+    } else {
+      lostBadge.textContent = 'Peso mantido estável';
+      lostBadge.style.color = 'var(--text-muted)';
+    }
+  } else {
+    lostBadge.textContent = 'Registre sua primeira pesagem!';
+  }
+
+  // Progresso
+  const progressFill = document.getElementById('weight-progress-bar-fill');
+  const progressPctEl = document.getElementById('disp-weight-progress-pct');
+  const remainingEl = document.getElementById('disp-weight-remaining');
+
+  if (startWeight && targetWeight && currentWeight) {
+    const totalToLose = startWeight - targetWeight;
+    const alreadyLost = startWeight - currentWeight;
+
+    if (totalToLose > 0) {
+      const pct = Math.max(0, Math.min(100, Math.round((alreadyLost / totalToLose) * 100)));
+      progressFill.style.width = `${pct}%`;
+      progressPctEl.textContent = `${pct}%`;
+
+      const remaining = (currentWeight - targetWeight).toFixed(1);
+      if (remaining <= 0) {
+        remainingEl.textContent = '🏆 Meta de peso alcançada! Parabéns!';
+        remainingEl.style.color = 'var(--primary)';
+      } else {
+        remainingEl.textContent = `Faltam ${remaining} kg para sua meta (${targetWeight} kg)!`;
+        remainingEl.style.color = 'var(--text-muted)';
+      }
+    } else {
+      progressFill.style.width = '0%';
+      progressPctEl.textContent = '0%';
+      remainingEl.textContent = 'Meta configurada.';
+    }
+  } else {
+    progressFill.style.width = '0%';
+    progressPctEl.textContent = '0%';
+    remainingEl.textContent = 'Toque em "🎯 Definir Metas" para acompanhar seu progresso.';
+  }
+
+  renderWeightChart();
+  renderWeightHistoryList();
+}
+
+function renderWeightChart() {
+  const container = document.getElementById('weight-chart-wrapper');
+  if (!container) return;
+
+  const entries = (state.weightTracker.entries || []).slice(0, 10).reverse();
+
+  if (entries.length < 2) {
+    container.innerHTML = `
+      <div style="text-align: center; color: var(--text-dim); padding: 30px 10px; font-size: 13px;">
+        <span style="font-size: 32px; display: block; margin-bottom: 6px;">📉</span>
+        Registre pelo menos duas pesagens para ver a curva do gráfico de evolução!
+      </div>
+    `;
+    return;
+  }
+
+  const width = container.clientWidth || 340;
+  const height = 150;
+  const padding = 28;
+
+  const weights = entries.map(e => e.weight);
+  const minW = Math.min(...weights) - 0.5;
+  const maxW = Math.max(...weights) + 0.5;
+  const rangeW = maxW - minW || 1;
+
+  const points = entries.map((e, idx) => {
+    const x = padding + (idx / (entries.length - 1)) * (width - padding * 2);
+    const y = height - padding - ((e.weight - minW) / rangeW) * (height - padding * 2);
+    return { x, y, weight: e.weight, date: new Date(e.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) };
+  });
+
+  const pathD = points.reduce((acc, p, i) => `${acc} ${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)},${p.y.toFixed(1)}`, '');
+  const areaD = `${pathD} L ${points[points.length - 1].x.toFixed(1)},${height - padding} L ${points[0].x.toFixed(1)},${height - padding} Z`;
+
+  let svg = `
+    <svg width="100%" height="${height}" viewBox="0 0 ${width} ${height}" style="overflow: visible;">
+      <defs>
+        <linearGradient id="weightGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#00e676" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#00e676" stop-opacity="0.0"/>
+        </linearGradient>
+      </defs>
+      <path d="${areaD}" fill="url(#weightGrad)" />
+      <path d="${pathD}" fill="none" stroke="#00e676" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  `;
+
+  points.forEach((p) => {
+    svg += `
+      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="#00e676" stroke="#0e1117" stroke-width="2"/>
+      <text x="${p.x.toFixed(1)}" y="${(p.y - 8).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="800" fill="#f0f4fc">${p.weight}kg</text>
+      <text x="${p.x.toFixed(1)}" y="${height - 8}" text-anchor="middle" font-size="10" font-weight="600" fill="#657088">${p.date}</text>
+    `;
+  });
+
+  svg += `</svg>`;
+  container.innerHTML = svg;
+}
+
+function renderWeightHistoryList() {
+  const container = document.getElementById('weight-history-list');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const entries = state.weightTracker.entries || [];
+  if (entries.length === 0) {
+    container.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 20px;">Nenhuma pesagem registrada ainda.</p>`;
+    return;
+  }
+
+  entries.forEach((entry, idx) => {
+    const d = new Date(entry.date);
+    const dateFormatted = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const timeFormatted = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+    let diffHtml = '';
+    const nextOlder = entries[idx + 1];
+    if (nextOlder) {
+      const diff = (entry.weight - nextOlder.weight).toFixed(1);
+      if (diff < 0) {
+        diffHtml = `<span class="weight-diff-badge down">▼ ${Math.abs(diff)} kg</span>`;
+      } else if (diff > 0) {
+        diffHtml = `<span class="weight-diff-badge up">▲ +${diff} kg</span>`;
+      } else {
+        diffHtml = `<span class="weight-diff-badge equal">= estável</span>`;
+      }
+    }
+
+    const item = document.createElement('div');
+    item.className = 'weight-history-item';
+    item.innerHTML = `
+      <div class="weight-hist-left">
+        <span class="weight-hist-val">${entry.weight.toFixed(1)} kg</span>
+        <span class="weight-hist-date">${dateFormatted} às ${timeFormatted}</span>
+        ${entry.note ? `<span class="weight-hist-note">💬 ${entry.note}</span>` : ''}
+      </div>
+      <div class="weight-hist-right">
+        ${diffHtml}
+        <button class="btn-del-history-item btn-del-weight-entry" title="Excluir pesagem">&times;</button>
+      </div>
+    `;
+
+    item.querySelector('.btn-del-weight-entry').addEventListener('click', () => {
+      openConfirmDeleteModal({
+        title: 'Excluir Pesagem',
+        message: `Deseja realmente apagar a pesagem de <strong>${entry.weight.toFixed(1)} kg</strong> do dia ${dateFormatted}?`,
+        requireTyping: false,
+        onConfirm: () => {
+          state.weightTracker.entries = state.weightTracker.entries.filter(e => e.id !== entry.id);
+          saveWeightTracker();
+          renderWeightView();
+        }
+      });
+    });
+
+    container.appendChild(item);
+  });
+}
+
 // --- 8. ABA HISTÓRICO ---
 function setupHistoryTab() {
   renderHistoryList();
@@ -1467,7 +1737,8 @@ function setupSettingsTab() {
       exercises: state.exercises,
       routines: state.routines,
       history: state.history,
-      settings: state.settings
+      settings: state.settings,
+      weightTracker: state.weightTracker
     };
     const jsonStr = JSON.stringify(dataToExport, null, 2);
     const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -1493,11 +1764,13 @@ function setupSettingsTab() {
           state.routines = imported.routines;
           if (imported.history) state.history = imported.history;
           if (imported.settings) state.settings = imported.settings;
+          if (imported.weightTracker) state.weightTracker = imported.weightTracker;
 
           saveExercises();
           saveRoutines();
           saveHistory();
           saveSettings();
+          saveWeightTracker();
 
           alert('Backup restaurado com sucesso!');
           location.reload();
