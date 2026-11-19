@@ -1409,8 +1409,11 @@ function renderHistoryList() {
 
     card.innerHTML = `
       <div class="history-header">
-        <span class="history-title">${h.routineName || 'Treino'}</span>
-        <span class="history-date">${dateFormatted} às ${timeFormatted}</span>
+        <div>
+          <span class="history-title">${h.routineName || 'Treino'}</span>
+          <div class="history-date">${dateFormatted} às ${timeFormatted}</div>
+        </div>
+        <button class="btn-del-history-item" data-id="${h.id}" title="Excluir este treino">&times;</button>
       </div>
       <div class="history-stats-bar">
         <div class="history-stat">Duração: <strong>${formatTime(h.totalSeconds)}</strong></div>
@@ -1420,6 +1423,17 @@ function renderHistoryList() {
         ${exercisesHtml}
       </div>
     `;
+
+    // Excluir treino individual
+    card.querySelector('.btn-del-history-item').addEventListener('click', () => {
+      if (confirm('Deseja excluir este treino do histórico?')) {
+        state.history = state.history.filter(item => item.id !== h.id);
+        saveHistory();
+        renderHistoryList();
+        updateStreakDisplay();
+      }
+    });
+
     container.appendChild(card);
   });
 }
@@ -1490,6 +1504,17 @@ function setupSettingsTab() {
       }
     };
     reader.readAsText(file);
+  });
+
+  // Limpar todo o histórico de treinos
+  document.getElementById('btn-clear-history').addEventListener('click', () => {
+    if (confirm('Tem certeza de que deseja apagar TODO o histórico de treinos? Essa ação não pode ser desfeita.')) {
+      state.history = [];
+      saveHistory();
+      renderHistoryList();
+      updateStreakDisplay();
+      alert('Histórico de treinos apagado com sucesso!');
+    }
   });
 
   // Restaurar dados padrão

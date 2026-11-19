@@ -1,4 +1,4 @@
-const CACHE_NAME = 'athlon-v4';
+const CACHE_NAME = 'athlon-v5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
