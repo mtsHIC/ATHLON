@@ -332,7 +332,75 @@ let state = {
   settings: { goalMinutes: 60 },
   activeDay: 'seg', // Dia selecionado no editor de rotinas
   activeWorkout: null, // Treino em andamento se houver
-  weightTracker: { startWeight: null, targetWeight: null, entries: [] }
+  weightTracker: { startWeight: null, targetWeight: null, entries: [] },
+  nutrition: null
+};
+
+// Rotinas padrão de alimentação focadas em emagrecimento
+const DEFAULT_NUTRITION = {
+  alarmEnabled: true,
+  streak: 0,
+  lastCompletedDate: null,
+  dailyCompletions: {}, // { 'YYYY-MM-DD': { 'meal-id': true } }
+  meals: [
+    {
+      id: 'meal-1',
+      name: 'Café da Manhã',
+      time: '07:00',
+      items: [
+        { name: 'Ovos mexidos', amount: '2 unidades' },
+        { name: 'Pão integral ou aveia', amount: '30g' },
+        { name: 'Café preto s/ açúcar', amount: '1 xícara' }
+      ]
+    },
+    {
+      id: 'meal-2',
+      name: 'Lanche da Manhã',
+      time: '10:00',
+      items: [
+        { name: 'Maçã ou fruta da época', amount: '1 unidade' },
+        { name: 'Castanhas ou nozes', amount: '15g' }
+      ]
+    },
+    {
+      id: 'meal-3',
+      name: 'Almoço',
+      time: '13:00',
+      items: [
+        { name: 'Peito de frango grelhado', amount: '120g' },
+        { name: 'Arroz branco ou integral', amount: '80g' },
+        { name: 'Feijão cozido', amount: '80g' },
+        { name: 'Salada de folhas verdes', amount: 'À vontade' }
+      ]
+    },
+    {
+      id: 'meal-4',
+      name: 'Lanche da Tarde',
+      time: '16:00',
+      items: [
+        { name: 'Banana média', amount: '1 unidade' },
+        { name: 'Iogurte natural ou Whey Protein', amount: '1 porção (30g)' }
+      ]
+    },
+    {
+      id: 'meal-5',
+      name: 'Jantar',
+      time: '19:30',
+      items: [
+        { name: 'Frango grelhado ou patinho', amount: '120g' },
+        { name: 'Batata doce ou arroz', amount: '70g' },
+        { name: 'Legumes cozidos e salada', amount: 'À vontade' }
+      ]
+    },
+    {
+      id: 'meal-6',
+      name: 'Ceia',
+      time: '22:00',
+      items: [
+        { name: 'Chá de camomila ou ovos cozidos', amount: '1 xícara / 1 ovo' }
+      ]
+    }
+  ]
 };
 
 // Timers de Execução
@@ -370,6 +438,64 @@ function playBeep() {
   }
 }
 
+// Alarme sonoro melódico para as refeições (3 tons)
+function playMealAlarmSound() {
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, idx) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.14);
+      gain.gain.setValueAtTime(0.25, audioCtx.currentTime + idx * 0.14);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.14 + 0.35);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(audioCtx.currentTime + idx * 0.14);
+      osc.stop(audioCtx.currentTime + idx * 0.14 + 0.35);
+    });
+    if ('vibrate' in navigator) {
+      navigator.vibrate([200, 100, 200, 100, 300]);
+    }
+  } catch (e) {
+    console.warn('Erro ao tocar som de refeição', e);
+  }
+}
+
+// Fanfarra triunfal para conquista de dieta 100% batida
+function playAchievementSound() {
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+    notes.forEach((freq, idx) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.12);
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime + idx * 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.12 + 0.45);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(audioCtx.currentTime + idx * 0.12);
+      osc.stop(audioCtx.currentTime + idx * 0.12 + 0.45);
+    });
+    if ('vibrate' in navigator) {
+      navigator.vibrate([150, 80, 150, 80, 400]);
+    }
+  } catch (e) {}
+}
+
 // --- 3. PERSISTÊNCIA LOCAL (LOCALSTORAGE) ---
 function loadData() {
   try {
@@ -402,6 +528,15 @@ function loadData() {
 
     const rawActiveWorkout = localStorage.getItem('mt_active_workout');
     state.activeWorkout = rawActiveWorkout ? JSON.parse(rawActiveWorkout) : null;
+
+    const rawNutrition = localStorage.getItem('mt_nutrition');
+    state.nutrition = rawNutrition ? JSON.parse(rawNutrition) : JSON.parse(JSON.stringify(DEFAULT_NUTRITION));
+    if (!state.nutrition.meals || state.nutrition.meals.length === 0) {
+      state.nutrition.meals = JSON.parse(JSON.stringify(DEFAULT_NUTRITION.meals));
+    }
+    if (state.nutrition.alarmEnabled === undefined) state.nutrition.alarmEnabled = true;
+    if (!state.nutrition.dailyCompletions) state.nutrition.dailyCompletions = {};
+    if (state.nutrition.streak === undefined) state.nutrition.streak = 0;
   } catch (e) {
     console.error('Erro ao ler localStorage, usando padrões', e);
     state.exercises = DEFAULT_EXERCISES;
@@ -409,7 +544,12 @@ function loadData() {
     state.history = [];
     state.settings = { goalMinutes: 60 };
     state.weightTracker = { startWeight: null, targetWeight: null, entries: [] };
+    state.nutrition = JSON.parse(JSON.stringify(DEFAULT_NUTRITION));
   }
+}
+
+function saveNutrition() {
+  localStorage.setItem('mt_nutrition', JSON.stringify(state.nutrition));
 }
 
 function saveExercises() {
@@ -464,6 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupTodayTab();
   setupRoutinesTab();
   setupExercisesTab();
+  setupNutritionTab();
   setupWeightTab();
   setupHistoryTab();
   setupSettingsTab();
@@ -524,6 +665,7 @@ function setupNavigation() {
       if (targetId === 'tab-history') renderHistoryList();
       if (targetId === 'tab-exercises') renderExercisesCatalog();
       if (targetId === 'tab-routines') renderRoutineEditor();
+      if (targetId === 'tab-nutrition') renderNutritionView();
       if (targetId === 'tab-weight') renderWeightView();
     });
   });
@@ -1742,7 +1884,8 @@ function setupSettingsTab() {
       routines: state.routines,
       history: state.history,
       settings: state.settings,
-      weightTracker: state.weightTracker
+      weightTracker: state.weightTracker,
+      nutrition: state.nutrition
     };
     const jsonStr = JSON.stringify(dataToExport, null, 2);
     const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -1769,12 +1912,14 @@ function setupSettingsTab() {
           if (imported.history) state.history = imported.history;
           if (imported.settings) state.settings = imported.settings;
           if (imported.weightTracker) state.weightTracker = imported.weightTracker;
+          if (imported.nutrition) state.nutrition = imported.nutrition;
 
           saveExercises();
           saveRoutines();
           saveHistory();
           saveSettings();
           saveWeightTracker();
+          if (imported.nutrition) saveNutrition();
 
           alert('Backup restaurado com sucesso!');
           location.reload();
@@ -1929,5 +2074,509 @@ function setupModals() {
   // Modal Trocar Dia
   document.getElementById('btn-close-switch-day').addEventListener('click', () => {
     document.getElementById('modal-switch-day').classList.add('hidden');
+  });
+}
+
+// ========================================================
+// --- MÓDULO DE NUTRIÇÃO, ALIMENTAÇÃO & ALARMES ---
+// ========================================================
+
+let nutritionCountdownInterval = null;
+let nutritionAlarmInterval = null;
+let lastTriggeredAlarmKey = null;
+
+function setupNutritionTab() {
+  // Botão abrir modal nova refeição
+  const btnAddMeal = document.getElementById('btn-add-meal-modal');
+  if (btnAddMeal) {
+    btnAddMeal.addEventListener('click', () => openMealEditor());
+  }
+
+  // Fechar modal refeição
+  const btnCloseMeal = document.getElementById('btn-close-modal-meal');
+  if (btnCloseMeal) {
+    btnCloseMeal.addEventListener('click', closeMealEditor);
+  }
+  const btnCancelMeal = document.getElementById('btn-cancel-meal');
+  if (btnCancelMeal) {
+    btnCancelMeal.addEventListener('click', closeMealEditor);
+  }
+
+  // Adicionar linha de alimento dinâmico no modal
+  const btnAddFoodRow = document.getElementById('btn-add-food-row');
+  if (btnAddFoodRow) {
+    btnAddFoodRow.addEventListener('click', () => addFoodInputRow());
+  }
+
+  // Form salvar refeição
+  const formMeal = document.getElementById('form-meal-editor');
+  if (formMeal) {
+    formMeal.addEventListener('submit', handleSaveMeal);
+  }
+
+  // Toggle do Alarme
+  const btnToggleAlarm = document.getElementById('btn-toggle-meal-alarm');
+  if (btnToggleAlarm) {
+    btnToggleAlarm.addEventListener('click', toggleMealAlarmSetting);
+  }
+
+  // Testar som do alarme
+  const btnTestSound = document.getElementById('btn-test-meal-sound');
+  if (btnTestSound) {
+    btnTestSound.addEventListener('click', () => {
+      playMealAlarmSound();
+    });
+  }
+
+  // Fechar banner de alerta ativo
+  const btnDismissAlert = document.getElementById('btn-dismiss-meal-alert');
+  if (btnDismissAlert) {
+    btnDismissAlert.addEventListener('click', () => {
+      document.getElementById('meal-active-alert').classList.add('hidden');
+    });
+  }
+
+  // Fechar modal de conquista
+  const btnCloseAchievement = document.getElementById('btn-close-achievement');
+  if (btnCloseAchievement) {
+    btnCloseAchievement.addEventListener('click', () => {
+      document.getElementById('modal-meal-achievement').classList.add('hidden');
+    });
+  }
+
+  // Iniciar temporizador de verificação de alarmes (a cada 20 segundos)
+  if (nutritionAlarmInterval) clearInterval(nutritionAlarmInterval);
+  nutritionAlarmInterval = setInterval(checkMealAlarms, 20000);
+
+  // Iniciar contagem regressiva para próxima refeição (a cada 10 segundos)
+  if (nutritionCountdownInterval) clearInterval(nutritionCountdownInterval);
+  nutritionCountdownInterval = setInterval(updateNextMealCountdown, 10000);
+
+  renderNutritionView();
+}
+
+function renderNutritionView() {
+  if (!state.nutrition) return;
+  const todayStr = new Date().toISOString().slice(0, 10);
+  if (!state.nutrition.dailyCompletions) state.nutrition.dailyCompletions = {};
+  if (!state.nutrition.dailyCompletions[todayStr]) {
+    state.nutrition.dailyCompletions[todayStr] = {};
+  }
+  const todayCompletions = state.nutrition.dailyCompletions[todayStr];
+
+  // Ordenar refeições cronologicamente por horário
+  state.nutrition.meals.sort((a, b) => a.time.localeCompare(b.time));
+
+  // Metas do dia
+  const totalMeals = state.nutrition.meals.length;
+  const completedMeals = state.nutrition.meals.filter(m => todayCompletions[m.id]).length;
+  const pct = totalMeals > 0 ? Math.round((completedMeals / totalMeals) * 100) : 0;
+
+  const progressTextEl = document.getElementById('nutrition-progress-text');
+  if (progressTextEl) {
+    progressTextEl.textContent = `${completedMeals} de ${totalMeals} concluídas`;
+  }
+  const progressPctEl = document.getElementById('nutrition-progress-pct');
+  if (progressPctEl) {
+    progressPctEl.textContent = `${pct}%`;
+  }
+  const progressBarFill = document.getElementById('nutrition-progress-bar-fill');
+  if (progressBarFill) {
+    progressBarFill.style.width = `${pct}%`;
+  }
+
+  // Streak e Conquista
+  const streakCountEl = document.getElementById('diet-streak-count');
+  if (streakCountEl) {
+    streakCountEl.textContent = `${state.nutrition.streak || 0} dias`;
+  }
+  const badgeEl = document.getElementById('diet-achievement-badge');
+  if (badgeEl) {
+    const s = state.nutrition.streak || 0;
+    if (s === 0) badgeEl.textContent = '🛡️ Foco Inicial';
+    else if (s < 3) badgeEl.textContent = '⚡ Metabolismo Ativo';
+    else if (s < 7) badgeEl.textContent = '🥗 Foco de Elite';
+    else badgeEl.textContent = '🏆 Dieta Blindada (Lenda)';
+  }
+
+  // Atualizar status do botão de alarme
+  updateAlarmButtonUI();
+
+  // Atualizar próxima refeição
+  updateNextMealCountdown();
+
+  // Renderizar Lista de Refeições
+  const container = document.getElementById('nutrition-meals-list');
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (state.nutrition.meals.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state-card text-center p-4">
+        <p>Nenhuma refeição cadastrada ainda.</p>
+        <button class="btn btn-primary btn-small mt-2" onclick="openMealEditor()">+ Cadastrar Refeição</button>
+      </div>
+    `;
+    return;
+  }
+
+  state.nutrition.meals.forEach((meal) => {
+    const isCompleted = !!todayCompletions[meal.id];
+    const card = document.createElement('div');
+    card.className = `meal-card ${isCompleted ? 'completed' : ''}`;
+
+    const itemsHtml = meal.items && meal.items.length > 0
+      ? meal.items.map(item => `
+          <div class="food-item-row">
+            <span class="food-name">${item.name}</span>
+            <span class="food-amount-badge">${item.amount}</span>
+          </div>
+        `).join('')
+      : '<p class="text-muted text-sm italic">Nenhum alimento cadastrado.</p>';
+
+    card.innerHTML = `
+      <div class="meal-card-header">
+        <div class="meal-name-row">
+          <span class="meal-time-tag">⏰ ${meal.time}</span>
+          <h4>${meal.name}</h4>
+        </div>
+        <div class="meal-actions-btns">
+          <button class="btn-meal-action btn-meal-edit" data-id="${meal.id}" title="Editar Refeição">✏️</button>
+          <button class="btn-meal-action btn-meal-del" data-id="${meal.id}" title="Excluir Refeição">🗑️</button>
+        </div>
+      </div>
+
+      <div class="food-items-list">
+        ${itemsHtml}
+      </div>
+
+      <button class="meal-check-btn ${isCompleted ? 'completed' : ''}" data-id="${meal.id}">
+        ${isCompleted ? '✅ Refeição Concluída' : '⏳ Marcar como Feito'}
+      </button>
+    `;
+
+    card.querySelector('.meal-check-btn').addEventListener('click', () => {
+      toggleMealCompletion(meal.id);
+    });
+
+    card.querySelector('.btn-meal-edit').addEventListener('click', () => {
+      openMealEditor(meal.id);
+    });
+
+    card.querySelector('.btn-meal-del').addEventListener('click', () => {
+      confirmDeleteMeal(meal.id);
+    });
+
+    container.appendChild(card);
+  });
+}
+
+function updateAlarmButtonUI() {
+  const btn = document.getElementById('btn-toggle-meal-alarm');
+  const iconEl = document.getElementById('alarm-icon');
+  const textEl = document.getElementById('alarm-status-text');
+  if (!btn || !state.nutrition) return;
+
+  if (state.nutrition.alarmEnabled) {
+    btn.classList.add('active');
+    if (iconEl) iconEl.textContent = '🔔';
+    if (textEl) textEl.textContent = 'Alarme Ativo';
+  } else {
+    btn.classList.remove('active');
+    if (iconEl) iconEl.textContent = '🔕';
+    if (textEl) textEl.textContent = 'Alarme Silenciado';
+  }
+}
+
+function toggleMealAlarmSetting() {
+  if (!state.nutrition) return;
+  state.nutrition.alarmEnabled = !state.nutrition.alarmEnabled;
+  saveNutrition();
+  updateAlarmButtonUI();
+
+  if (state.nutrition.alarmEnabled) {
+    playMealAlarmSound();
+    // Solicitar permissão de notificação se suportado
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }
+}
+
+function updateNextMealCountdown() {
+  if (!state.nutrition || !state.nutrition.meals || state.nutrition.meals.length === 0) return;
+
+  const now = new Date();
+  const curMinutes = now.getHours() * 60 + now.getMinutes();
+  const todayStr = now.toISOString().slice(0, 10);
+  const todayCompletions = (state.nutrition.dailyCompletions && state.nutrition.dailyCompletions[todayStr]) || {};
+
+  // Procurar próxima refeição ainda NÃO concluída hoje
+  let nextMeal = null;
+  let minDiff = Infinity;
+
+  for (const m of state.nutrition.meals) {
+    if (todayCompletions[m.id]) continue; // Já feita hoje
+
+    const parts = m.time.split(':');
+    const mealMinutes = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+    const diff = mealMinutes - curMinutes;
+
+    if (diff >= 0 && diff < minDiff) {
+      minDiff = diff;
+      nextMeal = m;
+    }
+  }
+
+  // Se todas as refeições de hoje já passaram ou foram concluídas
+  if (!nextMeal) {
+    const incompleteMeals = state.nutrition.meals.filter(m => !todayCompletions[m.id]);
+    if (incompleteMeals.length > 0) {
+      nextMeal = incompleteMeals[0];
+      minDiff = 0;
+    } else {
+      nextMeal = state.nutrition.meals[0];
+      const parts = nextMeal.time.split(':');
+      const mealMinutes = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+      minDiff = (24 * 60 - curMinutes) + mealMinutes;
+    }
+  }
+
+  const nameEl = document.getElementById('next-meal-name');
+  const timeEl = document.getElementById('next-meal-time');
+  const countEl = document.getElementById('next-meal-countdown');
+
+  if (nextMeal) {
+    if (nameEl) nameEl.textContent = nextMeal.name;
+    if (timeEl) timeEl.textContent = nextMeal.time;
+
+    if (countEl) {
+      if (minDiff === 0) {
+        countEl.textContent = 'Horário atual da refeição!';
+      } else if (minDiff < 60) {
+        countEl.textContent = `Faltam ${minDiff} min`;
+      } else {
+        const hrs = Math.floor(minDiff / 60);
+        const mins = minDiff % 60;
+        countEl.textContent = `Faltam ${hrs}h ${mins > 0 ? mins + 'min' : ''}`;
+      }
+    }
+  }
+}
+
+function checkMealAlarms() {
+  if (!state.nutrition || !state.nutrition.alarmEnabled) return;
+  const now = new Date();
+  const curH = String(now.getHours()).padStart(2, '0');
+  const curM = String(now.getMinutes()).padStart(2, '0');
+  const curTimeStr = `${curH}:${curM}`;
+  const todayStr = now.toISOString().slice(0, 10);
+
+  const todayCompletions = (state.nutrition.dailyCompletions && state.nutrition.dailyCompletions[todayStr]) || {};
+
+  const matchingMeal = state.nutrition.meals.find(m => m.time === curTimeStr && !todayCompletions[m.id]);
+
+  if (matchingMeal) {
+    const alarmKey = `${todayStr}_${matchingMeal.id}_${curTimeStr}`;
+    if (lastTriggeredAlarmKey !== alarmKey) {
+      lastTriggeredAlarmKey = alarmKey;
+      triggerMealAlarm(matchingMeal);
+    }
+  }
+}
+
+function triggerMealAlarm(meal) {
+  playMealAlarmSound();
+
+  const alertBanner = document.getElementById('meal-active-alert');
+  if (alertBanner) {
+    document.getElementById('alert-meal-title').textContent = `🔔 HORA DA REFEIÇÃO: ${meal.name.toUpperCase()} (${meal.time})`;
+    const itemsSummary = meal.items && meal.items.length > 0
+      ? meal.items.map(it => `${it.amount} de ${it.name}`).join(', ')
+      : 'Hora de comer no horário certo!';
+    document.getElementById('alert-meal-desc').textContent = itemsSummary;
+    alertBanner.classList.remove('hidden');
+  }
+
+  // Notificação no celular / navegador
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try {
+      const bodyText = meal.items && meal.items.length > 0
+        ? meal.items.map(i => `${i.name} (${i.amount})`).join(', ')
+        : 'Mantenha o foco e a consistência no emagrecimento!';
+      new Notification(`ATHLON - Hora do ${meal.name}!`, {
+        body: `Horário: ${meal.time} | Cardápio: ${bodyText}`,
+        icon: 'icon-192.png'
+      });
+    } catch (e) {}
+  }
+}
+
+function toggleMealCompletion(mealId) {
+  if (!state.nutrition) return;
+  const todayStr = new Date().toISOString().slice(0, 10);
+  if (!state.nutrition.dailyCompletions) state.nutrition.dailyCompletions = {};
+  if (!state.nutrition.dailyCompletions[todayStr]) {
+    state.nutrition.dailyCompletions[todayStr] = {};
+  }
+
+  const currentStatus = !!state.nutrition.dailyCompletions[todayStr][mealId];
+  state.nutrition.dailyCompletions[todayStr][mealId] = !currentStatus;
+
+  // Verificar se agora TODAS as refeições foram concluídas
+  const totalMeals = state.nutrition.meals.length;
+  const completedMeals = state.nutrition.meals.filter(m => state.nutrition.dailyCompletions[todayStr][m.id]).length;
+
+  if (totalMeals > 0 && completedMeals === totalMeals) {
+    // 100% concluído hoje!
+    if (state.nutrition.lastCompletedDate !== todayStr) {
+      state.nutrition.streak = (state.nutrition.streak || 0) + 1;
+      state.nutrition.lastCompletedDate = todayStr;
+      saveNutrition();
+
+      playAchievementSound();
+      showMealAchievementModal();
+    } else {
+      saveNutrition();
+    }
+  } else {
+    saveNutrition();
+  }
+
+  renderNutritionView();
+}
+
+function showMealAchievementModal() {
+  const modal = document.getElementById('modal-meal-achievement');
+  if (!modal) return;
+  const streakText = document.getElementById('achievement-streak-text');
+  if (streakText) {
+    streakText.textContent = `Ofensiva de ${state.nutrition.streak || 1} dias de dieta 100% batida!`;
+  }
+  modal.classList.remove('hidden');
+}
+
+// Modal de Criação / Edição de Refeição
+function openMealEditor(mealId = null) {
+  const modal = document.getElementById('modal-meal-editor');
+  const titleEl = document.getElementById('modal-meal-title');
+  const idInput = document.getElementById('meal-edit-id');
+  const nameInput = document.getElementById('meal-name-input');
+  const timeInput = document.getElementById('meal-time-input');
+  const rowsContainer = document.getElementById('meal-food-rows-container');
+
+  if (!modal) return;
+
+  rowsContainer.innerHTML = '';
+
+  if (mealId && state.nutrition) {
+    const meal = state.nutrition.meals.find(m => m.id === mealId);
+    if (meal) {
+      titleEl.textContent = 'Editar Refeição';
+      idInput.value = meal.id;
+      nameInput.value = meal.name;
+      timeInput.value = meal.time;
+      if (meal.items && meal.items.length > 0) {
+        meal.items.forEach(it => addFoodInputRow(it.name, it.amount));
+      } else {
+        addFoodInputRow();
+      }
+    }
+  } else {
+    titleEl.textContent = 'Nova Refeição';
+    idInput.value = '';
+    nameInput.value = '';
+    timeInput.value = '12:00';
+    addFoodInputRow('Peito de frango grelhado', '120g');
+    addFoodInputRow('Arroz branco ou integral', '50g');
+  }
+
+  modal.classList.remove('hidden');
+}
+
+function closeMealEditor() {
+  const modal = document.getElementById('modal-meal-editor');
+  if (modal) modal.classList.add('hidden');
+}
+
+function addFoodInputRow(name = '', amount = '') {
+  const container = document.getElementById('meal-food-rows-container');
+  if (!container) return;
+
+  const row = document.createElement('div');
+  row.className = 'food-input-row';
+  row.innerHTML = `
+    <input type="text" class="form-input food-name-input" placeholder="Alimento (ex: Arroz)" value="${name}" required>
+    <input type="text" class="form-input food-amount-input" placeholder="Qtd (ex: 50g)" value="${amount}" required>
+    <button type="button" class="btn-remove-food" title="Remover">&times;</button>
+  `;
+
+  row.querySelector('.btn-remove-food').addEventListener('click', () => {
+    row.remove();
+  });
+
+  container.appendChild(row);
+}
+
+function handleSaveMeal(e) {
+  e.preventDefault();
+  if (!state.nutrition) return;
+
+  const idInput = document.getElementById('meal-edit-id');
+  const nameInput = document.getElementById('meal-name-input');
+  const timeInput = document.getElementById('meal-time-input');
+  const container = document.getElementById('meal-food-rows-container');
+
+  const mealId = idInput.value;
+  const name = nameInput.value.trim();
+  const time = timeInput.value;
+
+  const items = [];
+  container.querySelectorAll('.food-input-row').forEach(row => {
+    const fName = row.querySelector('.food-name-input').value.trim();
+    const fAmount = row.querySelector('.food-amount-input').value.trim();
+    if (fName) {
+      items.push({ name: fName, amount: fAmount || '1 porção' });
+    }
+  });
+
+  if (mealId) {
+    // Atualizar refeição existente
+    const existing = state.nutrition.meals.find(m => m.id === mealId);
+    if (existing) {
+      existing.name = name;
+      existing.time = time;
+      existing.items = items;
+    }
+  } else {
+    // Nova refeição
+    const newId = `meal-${Date.now()}`;
+    state.nutrition.meals.push({
+      id: newId,
+      name,
+      time,
+      items
+    });
+  }
+
+  saveNutrition();
+  closeMealEditor();
+  renderNutritionView();
+}
+
+function confirmDeleteMeal(mealId) {
+  if (!state.nutrition) return;
+  const meal = state.nutrition.meals.find(m => m.id === mealId);
+  if (!meal) return;
+
+  openConfirmModal({
+    title: 'Excluir Refeição',
+    message: `Tem certeza de que deseja excluir a refeição <strong>${meal.name}</strong> (${meal.time})?`,
+    requireKeyword: false,
+    onConfirm: () => {
+      state.nutrition.meals = state.nutrition.meals.filter(m => m.id !== mealId);
+      saveNutrition();
+      renderNutritionView();
+    }
   });
 }

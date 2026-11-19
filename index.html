@@ -398,6 +398,90 @@
         </div>
       </section>
 
+      <!-- ABA: ALIMENTAÇÃO / DIETA & HORÁRIOS -->
+      <section id="tab-nutrition" class="tab-pane">
+        <div class="section-header-row">
+          <div>
+            <h2>Alimentação & Dieta</h2>
+            <p>Rotina de refeições, horários e foco em emagrecimento</p>
+          </div>
+          <button id="btn-add-meal-modal" class="btn btn-primary btn-small">
+            + Nova Refeição
+          </button>
+        </div>
+
+        <!-- Hero Card: Próxima Refeição e Alarme -->
+        <div class="nutrition-hero-card">
+          <div class="card-tech-dots dots-4x3"></div>
+          <div class="hero-slashes weight-slashes">
+            <span class="slash-streak streak-1"></span>
+            <span class="slash-streak streak-2"></span>
+          </div>
+          <div class="hero-wire-square wire-coral"></div>
+          <div class="hero-crosshair cross-top-right">+</div>
+          <div class="hero-crosshair cross-bottom-left">+</div>
+
+          <div class="next-meal-header">
+            <span class="next-meal-label">⚡ PRÓXIMA REFEIÇÃO</span>
+            <button id="btn-toggle-meal-alarm" class="alarm-toggle-btn active" title="Ativar/Desativar Alarme">
+              <span id="alarm-icon">🔔</span> <span id="alarm-status-text">Alarme Ativo</span>
+            </button>
+          </div>
+
+          <div class="next-meal-display">
+            <h3 id="next-meal-name">Carregando refeição...</h3>
+            <div class="next-meal-time-row">
+              <span class="next-meal-time-badge" id="next-meal-time">--:--</span>
+              <span class="next-meal-countdown" id="next-meal-countdown">Calculando horário...</span>
+            </div>
+          </div>
+
+          <!-- Barra de Progresso Diário de Refeições -->
+          <div class="meal-progress-box">
+            <div class="meal-progress-info">
+              <span>Metas do Dia: <strong id="nutrition-progress-text">0 de 6 concluídas</strong></span>
+              <strong id="nutrition-progress-pct" class="coral-glow">0%</strong>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill" id="nutrition-progress-bar-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card de Conquista / Streak da Dieta -->
+        <div class="diet-streak-card" id="diet-streak-card">
+          <div class="streak-header">
+            <div class="streak-badge">
+              <span class="fire-icon">🔥</span> <strong id="diet-streak-count">0 dias</strong> de Dieta Blindada
+            </div>
+            <span class="achievement-pill" id="diet-achievement-badge">🛡️ Foco Inicial</span>
+          </div>
+          <p class="diet-streak-tip" id="diet-streak-tip">Bata todas as refeições no horário para manter o déficit calórico e queimar gordura!</p>
+        </div>
+
+        <!-- Banner de Alerta / Alarme Ativo (quando dispara no horário) -->
+        <div id="meal-active-alert" class="meal-alert-banner hidden">
+          <div class="alert-bell-icon">🔔</div>
+          <div class="alert-info">
+            <strong id="alert-meal-title">HORA DA REFEIÇÃO!</strong>
+            <p id="alert-meal-desc">Hora de comer no horário certo para manter o metabolismo ativo.</p>
+          </div>
+          <button id="btn-dismiss-meal-alert" class="btn btn-primary btn-small">Entendido!</button>
+        </div>
+
+        <!-- Lista de Refeições Cadastradas -->
+        <div class="meals-list-header">
+          <h3>Cronograma de Refeições</h3>
+          <button id="btn-test-meal-sound" class="btn-sound-test" title="Testar som do alarme">
+            🔊 Testar Alarme
+          </button>
+        </div>
+
+        <div id="nutrition-meals-list" class="meals-cards-container">
+          <!-- Renderizado via JS -->
+        </div>
+      </section>
+
       <!-- ABA 5: HISTÓRICO DE TREINOS -->
       <section id="tab-history" class="tab-pane">
         <div class="section-header">
@@ -485,6 +569,12 @@
           <path d="m9 14 2 2 4-4"/>
         </svg>
         <span class="nav-label">Exercícios</span>
+      </button>
+      <button class="nav-item" data-tab="tab-nutrition">
+        <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 2v20M21 2v6a3 3 0 0 1-3 3M18 11v11M5 2v7a3 3 0 0 0 6 0V2M8 9v13"/>
+        </svg>
+        <span class="nav-label">Dieta</span>
       </button>
       <button class="nav-item" data-tab="tab-weight">
         <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -675,6 +765,63 @@
           <button type="button" class="btn btn-secondary" id="btn-cancel-confirm">Cancelar</button>
           <button type="button" class="btn btn-outline-danger" id="btn-execute-confirm">Excluir</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Cadastrar / Editar Refeição -->
+  <div id="modal-meal-editor" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-meal-title">Nova Refeição</h3>
+        <button class="modal-close" id="btn-close-modal-meal">&times;</button>
+      </div>
+      <form id="form-meal-editor" class="modal-body">
+        <input type="hidden" id="meal-edit-id">
+        <div class="form-group">
+          <label for="meal-name-input">Nome da Refeição *</label>
+          <input type="text" id="meal-name-input" class="form-input" required placeholder="Ex: Almoço, Lanche da Tarde">
+        </div>
+        <div class="form-group">
+          <label for="meal-time-input">Horário Previsto *</label>
+          <input type="time" id="meal-time-input" class="form-input" required value="12:00">
+        </div>
+
+        <div class="meal-items-section">
+          <div class="meal-items-header">
+            <h4>Alimentos & Quantidades</h4>
+            <button type="button" id="btn-add-food-row" class="btn btn-primary btn-small">+ Alimento</button>
+          </div>
+          <p class="meal-items-hint">Ex: 50 gramas de arroz, 120g frango grelhado, 1 maçã</p>
+          <div id="meal-food-rows-container" class="food-rows-container">
+            <!-- Linhas dinâmicas -->
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-meal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Refeição</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Conquista Diária de Dieta Blindada -->
+  <div id="modal-meal-achievement" class="modal-backdrop hidden">
+    <div class="modal-dialog achievement-modal-dialog">
+      <div class="modal-body achievement-body">
+        <div class="achievement-icon-trophy">🏆</div>
+        <span class="achievement-badge-tag">CONQUISTA DESBLOQUEADA</span>
+        <h2>DIETA 100% BLINDADA!</h2>
+        <p>Você cumpriu todas as refeições do dia dentro dos horários planejados!</p>
+        <div class="achievement-stat-box">
+          <span class="fire-icon">🔥</span>
+          <span id="achievement-streak-text">Ofensiva aumentada!</span>
+        </div>
+        <p class="achievement-quote">"A consistência na nutrição é 80% do seu resultado na queima de gordura."</p>
+        <button id="btn-close-achievement" class="btn btn-primary btn-large btn-block mt-3">
+          Continuar Focado 🚀
+        </button>
       </div>
     </div>
   </div>
