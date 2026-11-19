@@ -1,105 +1,115 @@
 // Meu Treino - PWA Offline App
 // Gerenciamento de exercícios, rotinas semanais, execução de treino com cronômetros e histórico
 
-// --- 1. DADOS INICIAIS (SEED) ---
+// --- 1. DADOS INICIAIS (SEED - TREINO PUSH / PULL / LEGS / UPPER / LOWER) ---
 const DEFAULT_EXERCISES = [
-  // Peito
-  { id: 'ex-1', name: 'Supino Reto', muscle: 'Peito', equipment: 'Barra e Banco', notes: 'Manter escápulas aduzidas e pés firmes no chão' },
-  { id: 'ex-2', name: 'Supino Inclinado', muscle: 'Peito', equipment: 'Halteres e Banco 30º', notes: 'Foco na porção superior do peitoral' },
-  { id: 'ex-3', name: 'Crucifixo / Peck Deck', muscle: 'Peito', equipment: 'Máquina', notes: 'Movimento controlado, sem bater os pesos' },
-  { id: 'ex-4', name: 'Crossover', muscle: 'Peito', equipment: 'Polia Alta', notes: 'Manter leve flexão dos cotovelos' },
-  
-  // Costas
-  { id: 'ex-5', name: 'Puxada Alta (Pulldown)', muscle: 'Costas', equipment: 'Polia', notes: 'Puxar em direção ao peito, não atrás do pescoço' },
-  { id: 'ex-6', name: 'Remada Baixa (Triângulo)', muscle: 'Costas', equipment: 'Polia / Máquina', notes: 'Tronco firme, estufar o peito na puxada' },
-  { id: 'ex-7', name: 'Remada Curvada', muscle: 'Costas', equipment: 'Barra', notes: 'Coluna ereta, puxar na linha do umbigo' },
-  
-  // Pernas
-  { id: 'ex-8', name: 'Agachamento Livre', muscle: 'Pernas', equipment: 'Barra Olímpica', notes: 'Descer até pelo menos 90 graus' },
-  { id: 'ex-9', name: 'Leg Press 45º', muscle: 'Pernas', equipment: 'Máquina', notes: 'Não hiperestender os joelhos no topo' },
-  { id: 'ex-10', name: 'Cadeira Extensora', muscle: 'Pernas', equipment: 'Máquina', notes: 'Segurar 1 segundo no pico de contração' },
-  { id: 'ex-11', name: 'Mesa Flexora', muscle: 'Pernas', equipment: 'Máquina', notes: 'Foco na parte posterior da coxa' },
-  { id: 'ex-12', name: 'Elevação de Panturrilha', muscle: 'Pernas', equipment: 'Máquina / Degrau', notes: 'Amplitude total' },
+  // PUSH / Peito, Ombros, Tríceps
+  { id: 'ex-1', name: 'Supino reto com barra', muscle: 'Peito', equipment: 'Barra e Banco', notes: 'Manter escápulas aduzidas e pés firmes no chão' },
+  { id: 'ex-2', name: 'Supino inclinado com halteres', muscle: 'Peito', equipment: 'Halteres e Banco 30º', notes: 'Foco na porção superior do peitoral' },
+  { id: 'ex-3', name: 'Desenvolvimento com halteres', muscle: 'Ombros', equipment: 'Halteres e Banco', notes: 'Não arquear excessivamente a lombar' },
+  { id: 'ex-4', name: 'Elevação lateral com halteres', muscle: 'Ombros', equipment: 'Halteres', notes: 'Subir até a altura dos ombros de forma controlada' },
+  { id: 'ex-5', name: 'Tríceps na polia com corda', muscle: 'Tríceps', equipment: 'Polia Alta', notes: 'Abrir a corda no final estendendo bem' },
+  { id: 'ex-6', name: 'Tríceps francês na polia', muscle: 'Tríceps', equipment: 'Polia Baixa / Média', notes: 'Cotovelos estáveis apontando para frente' },
 
-  // Ombros
-  { id: 'ex-13', name: 'Desenvolvimento', muscle: 'Ombros', equipment: 'Halteres e Banco', notes: 'Cuidado para não arquear a lombar' },
-  { id: 'ex-14', name: 'Elevação Lateral', muscle: 'Ombros', equipment: 'Halteres', notes: 'Elevar até a altura do ombro' },
-  { id: 'ex-15', name: 'Elevação Frontal', muscle: 'Ombros', equipment: 'Polia ou Halteres', notes: 'Movimento cadenciado' },
+  // PULL / Costas, Ombros Posterior, Bíceps
+  { id: 'ex-7', name: 'Puxada alta na polia', muscle: 'Costas', equipment: 'Polia Alta', notes: 'Puxar direcionando cotovelos para o chão, peito estufado' },
+  { id: 'ex-8', name: 'Remada baixa com triângulo', muscle: 'Costas', equipment: 'Polia / Máquina', notes: 'Manter coluna ereta e puxar em direção ao umbigo' },
+  { id: 'ex-9', name: 'Remada com halteres apoiado no banco', muscle: 'Costas', equipment: 'Halteres e Banco Inclinado', notes: 'Peito apoiado no banco, alívio total na lombar' },
+  { id: 'ex-10', name: 'Crucifixo inverso na máquina', muscle: 'Ombros', equipment: 'Máquina Peck Deck Inverso', notes: 'Foco no deltóide posterior' },
+  { id: 'ex-11', name: 'Rosca direta com barra', muscle: 'Bíceps', equipment: 'Barra W ou Reta', notes: 'Cotovelos colados ao corpo sem balançar o tronco' },
+  { id: 'ex-12', name: 'Rosca martelo com halteres', muscle: 'Bíceps', equipment: 'Halteres', notes: 'Pegada neutra, fortalece braquial e antebraço' },
 
-  // Braços
-  { id: 'ex-16', name: 'Rosca Direta', muscle: 'Bíceps', equipment: 'Barra W', notes: 'Cotovelos colados ao corpo' },
-  { id: 'ex-17', name: 'Rosca Martelo', muscle: 'Bíceps', equipment: 'Halteres', notes: 'Pegada neutra' },
-  { id: 'ex-18', name: 'Tríceps Corda', muscle: 'Tríceps', equipment: 'Polia Alta', notes: 'Abrir a corda no final do movimento' },
-  { id: 'ex-19', name: 'Tríceps Francês', muscle: 'Tríceps', equipment: 'Halter', notes: 'Cotovelos apontando para o teto' },
+  // LEGS / Pernas, Glúteos, Panturrilha
+  { id: 'ex-13', name: 'Agachamento com barra', muscle: 'Pernas', equipment: 'Barra Olímpica / Suporte', notes: 'Pés na largura dos ombros, descida controlada' },
+  { id: 'ex-14', name: 'Leg press 45°', muscle: 'Pernas', equipment: 'Máquina', notes: 'Costas bem apoiadas, não travar o joelho no topo' },
+  { id: 'ex-15', name: 'Cadeira extensora', muscle: 'Pernas', equipment: 'Máquina', notes: 'Segurar 1 segundo no topo contraindo a coxa' },
+  { id: 'ex-16', name: 'Mesa ou cadeira flexora', muscle: 'Pernas', equipment: 'Máquina', notes: 'Contração firme na parte posterior da perna' },
+  { id: 'ex-17', name: 'Elevação pélvica', muscle: 'Pernas', equipment: 'Barra ou Banco / Máquina', notes: 'Aperto máximo nos glúteos no ponto mais alto' },
+  { id: 'ex-18', name: 'Panturrilha em pé na máquina', muscle: 'Pernas', equipment: 'Máquina / Degrau', notes: 'Amplitude total: alongar bem embaixo e subir tudo' },
 
-  // Abdômen
-  { id: 'ex-20', name: 'Abdominal Crunch', muscle: 'Abdômen', equipment: 'Colchonete', notes: 'Contrair bem o abdômen' },
-  { id: 'ex-21', name: 'Prancha Isométrica', muscle: 'Abdômen', equipment: 'Colchonete', notes: 'Corpo em linha reta' }
+  // UPPER / Superior Completo
+  { id: 'ex-19', name: 'Supino inclinado na máquina', muscle: 'Peito', equipment: 'Máquina Articulada', notes: 'Movimento guiado e seguro para peitoral superior' },
+  { id: 'ex-20', name: 'Puxada alta com pegada neutra', muscle: 'Costas', equipment: 'Polia e Triângulo Neutro', notes: 'Ótima amplitude e conforto nos punhos e ombros' },
+  { id: 'ex-21', name: 'Remada unilateral com halter', muscle: 'Costas', equipment: 'Halter e Banco', notes: 'Puxar o halter rente ao corpo focando na dorsal' },
+  { id: 'ex-22', name: 'Elevação lateral na polia', muscle: 'Ombros', equipment: 'Polia Baixa', notes: 'Tensão constante em toda a amplitude' },
+  { id: 'ex-23', name: 'Rosca inclinada com halteres', muscle: 'Bíceps', equipment: 'Halteres e Banco 45º', notes: 'Alongamento máximo do bíceps no início' },
+
+  // LOWER / Inferior e Core
+  { id: 'ex-24', name: 'Levantamento terra romeno com halteres', muscle: 'Pernas', equipment: 'Halteres', notes: 'Quadril para trás, coluna reta, joelhos semiflexionados' },
+  { id: 'ex-25', name: 'Afundo reverso', muscle: 'Pernas', equipment: 'Halteres ou Peso Corporal', notes: 'Passo largo para trás, 90º nos dois joelhos' },
+  { id: 'ex-26', name: 'Cadeira abdutora', muscle: 'Pernas', equipment: 'Máquina', notes: 'Tronco firme, foco em glúteo médio' },
+  { id: 'ex-27', name: 'Panturrilha sentada', muscle: 'Pernas', equipment: 'Máquina de Panturrilha', notes: 'Foco no músculo sóleo da panturrilha' },
+  { id: 'ex-28', name: 'Abdominal crunch', muscle: 'Abdômen', equipment: 'Colchonete / Solo', notes: 'Aproximar costelas do quadril sem forçar o pescoço' }
 ];
 
 const DEFAULT_ROUTINES = {
   seg: {
-    name: 'Peito e Tríceps',
-    focus: 'Peitoral completo e tríceps',
+    name: 'Segunda-feira — PUSH',
+    focus: 'Peito, Ombros e Tríceps',
     items: [
-      { exerciseId: 'ex-1', sets: 4, reps: 10, weight: 40 },
-      { exerciseId: 'ex-2', sets: 4, reps: 10, weight: 16 },
-      { exerciseId: 'ex-3', sets: 3, reps: 12, weight: 35 },
-      { exerciseId: 'ex-18', sets: 4, reps: 12, weight: 20 },
-      { exerciseId: 'ex-19', sets: 3, reps: 10, weight: 12 }
+      { exerciseId: 'ex-1', sets: 3, reps: 10, weight: 20 },
+      { exerciseId: 'ex-2', sets: 3, reps: 10, weight: 12 },
+      { exerciseId: 'ex-3', sets: 3, reps: 10, weight: 10 },
+      { exerciseId: 'ex-4', sets: 3, reps: 12, weight: 6 },
+      { exerciseId: 'ex-5', sets: 3, reps: 12, weight: 15 },
+      { exerciseId: 'ex-6', sets: 3, reps: 12, weight: 12 }
     ]
   },
   ter: {
-    name: 'Costas e Bíceps',
-    focus: 'Dorsal e flexores do braço',
+    name: 'Terça-feira — PULL',
+    focus: 'Costas, Posterior de Ombro e Bíceps',
     items: [
-      { exerciseId: 'ex-5', sets: 4, reps: 10, weight: 45 },
-      { exerciseId: 'ex-6', sets: 4, reps: 10, weight: 40 },
-      { exerciseId: 'ex-7', sets: 3, reps: 10, weight: 30 },
-      { exerciseId: 'ex-16', sets: 4, reps: 10, weight: 15 },
-      { exerciseId: 'ex-17', sets: 3, reps: 12, weight: 12 }
+      { exerciseId: 'ex-7', sets: 3, reps: 10, weight: 35 },
+      { exerciseId: 'ex-8', sets: 3, reps: 10, weight: 30 },
+      { exerciseId: 'ex-9', sets: 3, reps: 10, weight: 12 },
+      { exerciseId: 'ex-10', sets: 3, reps: 12, weight: 20 },
+      { exerciseId: 'ex-11', sets: 3, reps: 10, weight: 12 },
+      { exerciseId: 'ex-12', sets: 3, reps: 10, weight: 10 }
     ]
   },
   qua: {
-    name: 'Pernas e Abdômen',
-    focus: 'Quadríceps, posterior e core',
+    name: 'Quarta-feira — LEGS',
+    focus: 'Pernas, Glúteos e Panturrilhas',
     items: [
-      { exerciseId: 'ex-8', sets: 4, reps: 10, weight: 50 },
-      { exerciseId: 'ex-9', sets: 4, reps: 12, weight: 120 },
-      { exerciseId: 'ex-10', sets: 3, reps: 12, weight: 40 },
-      { exerciseId: 'ex-11', sets: 3, reps: 12, weight: 35 },
-      { exerciseId: 'ex-12', sets: 4, reps: 15, weight: 50 },
-      { exerciseId: 'ex-20', sets: 3, reps: 20, weight: 0 }
+      { exerciseId: 'ex-13', sets: 3, reps: 10, weight: 20 },
+      { exerciseId: 'ex-14', sets: 3, reps: 10, weight: 80 },
+      { exerciseId: 'ex-15', sets: 3, reps: 12, weight: 30 },
+      { exerciseId: 'ex-16', sets: 3, reps: 12, weight: 25 },
+      { exerciseId: 'ex-17', sets: 3, reps: 10, weight: 20 },
+      { exerciseId: 'ex-18', sets: 3, reps: 15, weight: 40 }
     ]
   },
   qui: {
-    name: 'Ombros e Trapézio',
-    focus: 'Deltoides anterior, lateral e posterior',
+    name: 'Quinta-feira — UPPER',
+    focus: 'Superior Completo (Peito, Costas, Ombros e Braços)',
     items: [
-      { exerciseId: 'ex-13', sets: 4, reps: 10, weight: 14 },
-      { exerciseId: 'ex-14', sets: 4, reps: 12, weight: 8 },
-      { exerciseId: 'ex-15', sets: 3, reps: 12, weight: 10 },
-      { exerciseId: 'ex-21', sets: 3, reps: 45, weight: 0 }
+      { exerciseId: 'ex-19', sets: 3, reps: 10, weight: 25 },
+      { exerciseId: 'ex-20', sets: 3, reps: 10, weight: 35 },
+      { exerciseId: 'ex-21', sets: 3, reps: 10, weight: 12 },
+      { exerciseId: 'ex-22', sets: 3, reps: 12, weight: 5 },
+      { exerciseId: 'ex-23', sets: 3, reps: 10, weight: 8 },
+      { exerciseId: 'ex-5', sets: 3, reps: 12, weight: 15 }
     ]
   },
   sex: {
-    name: 'Superiores e Braços',
-    focus: 'Volume e intensidade',
+    name: 'Sexta-feira — LOWER',
+    focus: 'Inferiores e Abdômen',
     items: [
-      { exerciseId: 'ex-1', sets: 3, reps: 10, weight: 40 },
-      { exerciseId: 'ex-5', sets: 3, reps: 10, weight: 45 },
-      { exerciseId: 'ex-14', sets: 3, reps: 12, weight: 8 },
-      { exerciseId: 'ex-16', sets: 3, reps: 10, weight: 15 },
-      { exerciseId: 'ex-18', sets: 3, reps: 12, weight: 20 }
+      { exerciseId: 'ex-24', sets: 3, reps: 10, weight: 12 },
+      { exerciseId: 'ex-25', sets: 3, reps: 10, weight: 0 },
+      { exerciseId: 'ex-16', sets: 3, reps: 12, weight: 25 },
+      { exerciseId: 'ex-26', sets: 3, reps: 15, weight: 30 },
+      { exerciseId: 'ex-27', sets: 3, reps: 15, weight: 20 },
+      { exerciseId: 'ex-28', sets: 3, reps: 15, weight: 0 }
     ]
   },
   sab: {
-    name: 'Cardio / Descanso Ativo',
-    focus: 'Caminhada, corrida ou descanso',
+    name: 'Sábado — Descanso ou Cardio',
+    focus: 'Caminhada ou descanso ativo',
     items: []
   },
   dom: {
-    name: 'Descanso Total',
+    name: 'Domingo — Descanso Total',
     focus: 'Recuperação muscular',
     items: []
   }
@@ -164,11 +174,23 @@ function playBeep() {
 // --- 3. PERSISTÊNCIA LOCAL (LOCALSTORAGE) ---
 function loadData() {
   try {
-    const rawEx = localStorage.getItem('mt_exercises');
-    state.exercises = rawEx ? JSON.parse(rawEx) : DEFAULT_EXERCISES;
+    const versionKey = 'mt_app_version';
+    const currentVersion = '2.0-pplul';
+    const savedVersion = localStorage.getItem(versionKey);
 
+    const rawEx = localStorage.getItem('mt_exercises');
     const rawRoutines = localStorage.getItem('mt_routines');
-    state.routines = rawRoutines ? JSON.parse(rawRoutines) : DEFAULT_ROUTINES;
+
+    if (!savedVersion || savedVersion !== currentVersion) {
+      state.exercises = DEFAULT_EXERCISES;
+      state.routines = DEFAULT_ROUTINES;
+      saveExercises();
+      saveRoutines();
+      localStorage.setItem(versionKey, currentVersion);
+    } else {
+      state.exercises = rawEx ? JSON.parse(rawEx) : DEFAULT_EXERCISES;
+      state.routines = rawRoutines ? JSON.parse(rawRoutines) : DEFAULT_ROUTINES;
+    }
 
     const rawHistory = localStorage.getItem('mt_history');
     state.history = rawHistory ? JSON.parse(rawHistory) : [];
